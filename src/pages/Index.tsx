@@ -26,6 +26,14 @@ const ChatbotSkeleton = () => (
 const Index = () => {
   return (
     <div className="min-h-screen">
+      {/* Beta Warning Banner */}
+      <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 text-center">
+        <p className="text-sm text-amber-800">
+          <span className="font-semibold">GoNepal is currently in beta.</span>{" "}
+          Some features including hotel check-in verification are simulations for demonstration purposes only.{" "}
+          <span className="font-medium">Do not enter real passport or sensitive personal data.</span>
+        </p>
+      </div>
       <Navbar />
       <Hero />
       <StatsBar />
