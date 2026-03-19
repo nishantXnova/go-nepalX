@@ -49,7 +49,7 @@ const Hero = () => {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="mb-8"
             >
-              <span className="px-4 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-md text-[10px] md:text-xs font-medium uppercase tracking-[0.3em] text-white/80">
+              <span className="px-4 py-1.5 rounded-full border border-white/20 bg-white/20 text-[10px] md:text-xs font-medium uppercase tracking-[0.3em] text-white">
                 Beyond the Peaks
               </span>
             </motion.div>
@@ -62,7 +62,7 @@ const Hero = () => {
               className="text-5xl md:text-8xl lg:text-9xl font-bold text-white mb-8 tracking-tight leading-[0.9] font-sans"
             >
               Nepal. <br />
-              <span className="text-white/60">Soul of the Himalayas.</span>
+              <span className="text-white">Soul of the Himalayas.</span>
             </motion.h1>
 
             {/* Subheading */}
@@ -124,16 +124,6 @@ const Hero = () => {
             </motion.div>
           </div>
         </div>
-
-        {/* Minimal Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 1 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <div className="w-[1px] h-12 bg-gradient-to-b from-white/50 to-transparent" />
-        </motion.div>
       </section>
     </>
   );

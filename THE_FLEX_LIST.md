@@ -26,6 +26,13 @@ Use this to silence any critics. These aren't just features; they are engineerin
 
 ---
 
+## 🛡️ 4. ENTERPRISE SECURITY & GDPR (The Bulletproof Vault)
+*   **Edge Function Cryptography**: We don't just use serverless functions; we lock them down. First to implement **Strict JWT Payload Verification & CORS locking** across all Supabase Edge Functions. It only answers to `go-nepal.vercel.app`.
+*   **Data Cleansing Pipeline**: Complete user privacy. The system actively intercepts local storage caching, mathematically rounds GPS coordinates to 3 decimal places to anonymize location, and forcefully strips PII (Passport data) before anything hits the offline toolkit.
+*   **Stateless Global Trip Sharing**: While others rely on massive encoded URLs that break, we built a **Supabase-backed UUID translation layer** allowing instant, permanent generation of `/itinerary/:id` links that render cleanly without auth.
+
+---
+
 ## ⚔️ VS. THE COMPETITION (The "Shut Down")
 | Feature | Others / NTB | **Go-Nepal** |
 | :--- | :--- | :--- |

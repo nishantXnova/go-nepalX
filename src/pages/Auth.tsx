@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { getSafeErrorMessage } from '@/utils/errorUtils';
 import gonepallogo from '@/assets/gonepallogo.png';
 
 // Validation schemas
@@ -157,7 +158,7 @@ const Auth = () => {
         toast({
           variant: 'destructive',
           title: 'Login failed',
-          description: error.message,
+          description: getSafeErrorMessage(error),
         });
       } else {
         toast({
@@ -179,7 +180,7 @@ const Auth = () => {
         toast({
           variant: 'destructive',
           title: 'Signup failed',
-          description: error.message,
+          description: getSafeErrorMessage(error),
         });
       } else {
         navigate(`/auth/success?email=${encodeURIComponent(data.email)}`);
@@ -285,29 +286,62 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Panel - Decorative */}
+      {/* Left Panel - Premium Image Background */}
       <motion.div
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
-        className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden"
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-accent/60" />
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-accent/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary-foreground/10 rounded-full blur-3xl" />
-        </div>
-        <div className="relative z-10 flex flex-col justify-center p-12 text-primary-foreground">
-          <Link to="/" className="flex items-center gap-3 mb-12">
-            <img src={gonepallogo} alt="GoNepal" className="h-12 w-auto" />
-            <span className="text-2xl font-bold">GoNepal</span>
+        {/* Background Image with slight scale animation for premium feel */}
+        <motion.div 
+          className="absolute inset-0"
+          initial={{ scale: 1.05 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 10, ease: "easeOut" }}
+        >
+          <img 
+            src="/loginimg.png" 
+            alt="Nepal Mountains at Sunrise" 
+            className="w-full h-full object-cover"
+          />
+        </motion.div>
+
+        {/* Premium Gradient Overlays */}
+        {/* Dark vignette effect to frame the image securely */}
+        <div className="absolute inset-0 bg-black/20" />
+        {/* Deep gradient at the top for the logo and bottom for the text */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/5 to-black" />
+        
+        {/* Subtle color grading accent */}
+        <div className="absolute inset-0 bg-primary/10 mix-blend-overlay" />
+
+        <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 text-white h-full w-full">
+          {/* Top Section: Logo */}
+          <Link to="/" className="flex items-center gap-3 w-fit group">
+            <img src={gonepallogo} alt="GoNepal" className="h-10 w-auto opacity-90 group-hover:opacity-100 transition-opacity" />
+            <span className="text-2xl font-bold tracking-tight drop-shadow-lg">GoNepal</span>
           </Link>
-          <h1 className="heading-section text-4xl mb-6">
-            Discover the Magic of Nepal
-          </h1>
-          <p className="text-lg opacity-90 leading-relaxed max-w-md">
-            From the majestic Himalayas to ancient temples, explore breathtaking destinations and create unforgettable memories.
-          </p>
+
+          {/* Bottom Section: Text */}
+          <div className="mt-auto max-w-lg mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] mb-6 shadow-xl">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FFB800] animate-pulse" />
+                Start Your Journey
+              </div>
+              <h1 className="text-5xl xl:text-6xl font-black mb-6 leading-[1.1] tracking-tight text-white drop-shadow-2xl" style={{ fontFamily: '"Playfair Display", serif' }}>
+                Discover the Magic of Nepal
+              </h1>
+              <p className="text-lg text-white/80 leading-relaxed font-medium drop-shadow-md">
+                From the majestic Himalayas to ancient temples, explore breathtaking destinations and create unforgettable memories.
+              </p>
+            </motion.div>
+          </div>
         </div>
       </motion.div>
 
@@ -338,13 +372,13 @@ const Auth = () => {
 
 
           {/* Toggle buttons */}
-          <div className="flex bg-muted rounded-xl p-1 mb-8">
+          <div className="flex bg-muted/50 p-1.5 rounded-2xl mb-8 border border-border/50 shadow-inner">
             <button
               type="button"
               onClick={() => setIsLogin(true)}
-              className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all ${isLogin
-                ? 'bg-background shadow-sm text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
+              className={`flex-1 py-3.5 rounded-xl text-sm font-bold transition-all duration-300 ${isLogin
+                ? 'bg-white shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] text-foreground scale-[1.02]'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
                 }`}
             >
               Sign In
@@ -352,9 +386,9 @@ const Auth = () => {
             <button
               type="button"
               onClick={() => setIsLogin(false)}
-              className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all ${!isLogin
-                ? 'bg-background shadow-sm text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
+              className={`flex-1 py-3.5 rounded-xl text-sm font-bold transition-all duration-300 ${!isLogin
+                ? 'bg-white shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] text-foreground scale-[1.02]'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
                 }`}
             >
               Sign Up
@@ -418,7 +452,11 @@ const Auth = () => {
                   )}
                 />
 
-                <Button type="submit" className="w-full btn-primary" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-[#e35a26] to-[#E41B17] hover:from-[#d64e1c] hover:to-[#c0151a] text-white shadow-lg shadow-red-500/25 rounded-xl py-6 font-bold text-base transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                >
                   {isLoading ? 'Signing in...' : 'Sign In'}
                 </Button>
               </form>
@@ -537,7 +575,11 @@ const Auth = () => {
                   Password must be at least 8 characters with uppercase, lowercase, and a number.
                 </p>
 
-                <Button type="submit" className="w-full btn-primary" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-[#e35a26] to-[#E41B17] hover:from-[#d64e1c] hover:to-[#c0151a] text-white shadow-lg shadow-red-500/25 rounded-xl py-6 font-bold text-base transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                >
                   {isLoading ? 'Creating account...' : 'Create Account'}
                 </Button>
               </form>
@@ -546,13 +588,13 @@ const Auth = () => {
 
           <p className="text-center text-sm text-muted-foreground mt-8">
             By continuing, you agree to our{' '}
-            <a href="#" className="text-primary hover:underline">
+            <Link to="/terms" className="text-primary hover:underline">
               Terms of Service
-            </a>{' '}
+            </Link>{' '}
             and{' '}
-            <a href="#" className="text-primary hover:underline">
+            <Link to="/privacy" className="text-primary hover:underline">
               Privacy Policy
-            </a>
+            </Link>
           </p>
         </motion.div>
       </div>

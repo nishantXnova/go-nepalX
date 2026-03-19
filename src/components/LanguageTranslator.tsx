@@ -398,7 +398,7 @@ const LanguageTranslator = () => {
       <div className="container-wide">
         {/* Header */}
         <div className="text-center mb-12">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-nepal-forest/10 text-nepal-forest text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
             <Languages className="h-4 w-4" />
             Free & Open Source
           </span>
@@ -464,9 +464,9 @@ const LanguageTranslator = () => {
                     variant="outline"
                     size="icon"
                     onClick={handleSwap}
-                    className="mt-6 rounded-full h-10 w-10 border-nepal-forest/30 hover:bg-nepal-forest/10 hover:border-nepal-forest shrink-0"
+                    className="mt-6 rounded-full h-10 w-10 border-primary/30 hover:bg-primary/10 hover:border-primary shrink-0"
                   >
-                    <ArrowRightLeft className="h-4 w-4 text-nepal-forest" />
+                    <ArrowRightLeft className="h-4 w-4 text-primary" />
                   </Button>
 
                   <div className="flex-1">
@@ -529,7 +529,7 @@ const LanguageTranslator = () => {
                 <Button
                   onClick={translate}
                   disabled={isLoading || !inputText.trim()}
-                  className="w-full h-12 bg-nepal-forest text-background hover:bg-nepal-forest/90 text-lg font-semibold rounded-xl shadow-soft hover:shadow-card transition-all duration-300"
+                  className="w-full h-12 bg-primary text-background hover:bg-primary/90 text-lg font-semibold rounded-xl shadow-soft hover:shadow-card transition-all duration-300"
                 >
                   {isLoading ? (
                     <>
@@ -546,7 +546,7 @@ const LanguageTranslator = () => {
 
                 {/* Result */}
                 {translatedText && (
-                  <div className="mt-6 p-5 rounded-xl bg-nepal-forest/5 border border-nepal-forest/10">
+                  <div className="mt-6 p-5 rounded-xl bg-primary/5 border border-primary/10">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
                         <p className="text-sm text-muted-foreground mb-1">
@@ -556,7 +556,7 @@ const LanguageTranslator = () => {
                           {translatedText}
                         </p>
                         {pronunciation && (
-                          <p className="text-sm text-nepal-forest mt-2 italic">
+                          <p className="text-sm text-primary mt-2 italic">
                             Pronunciation: {pronunciation}
                           </p>
                         )}
@@ -577,7 +577,7 @@ const LanguageTranslator = () => {
                           className="h-8 w-8 text-muted-foreground hover:text-foreground"
                         >
                           {copied ? (
-                            <Check className="h-4 w-4 text-nepal-forest" />
+                            <Check className="h-4 w-4 text-primary" />
                           ) : (
                             <Copy className="h-4 w-4" />
                           )}
@@ -610,7 +610,7 @@ const LanguageTranslator = () => {
                       key={cat}
                       onClick={() => setSelectedCategory(cat)}
                       className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${selectedCategory === cat
-                        ? "bg-nepal-forest text-background shadow-soft"
+                        ? "bg-primary text-background shadow-soft"
                         : "bg-secondary text-muted-foreground hover:bg-secondary/80 hover:text-foreground"
                         }`}
                     >
@@ -629,19 +629,19 @@ const LanguageTranslator = () => {
                   {filteredPhrases.map((phrase, idx) => (
                     <div
                       key={idx}
-                      className="group p-4 rounded-xl bg-background/60 border border-border/60 hover:border-nepal-forest/30 hover:shadow-soft transition-all duration-300"
+                      className="group p-4 rounded-xl bg-background/60 border border-border/60 hover:border-primary/30 hover:shadow-soft transition-all duration-300"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-medium px-2 py-0.5 rounded bg-nepal-forest/10 text-nepal-forest">
+                            <span className="text-xs font-medium px-2 py-0.5 rounded bg-primary/10 text-primary">
                               {phrase.category}
                             </span>
                           </div>
                           <p className="font-medium text-foreground">
                             {phrase.en}
                           </p>
-                          <p className="text-lg font-semibold text-nepal-forest mt-1 font-display">
+                          <p className="text-lg font-semibold text-primary mt-1 font-display">
                             {phrase.ne}
                           </p>
                           <p className="text-sm text-muted-foreground italic">

@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { translateText, clearTranslationCache, getTranslationVaultSize, preloadCommonTranslations } from '@/lib/translationService';
 import { isOnline } from '@/lib/translationVault';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { logger } from '@/utils/logger';
 
 /**
  * useAutoTranslator - Hook for automatic translation of dynamic content
@@ -122,7 +123,7 @@ export const useAutoTranslator = (options: UseAutoTranslatorOptions = {}) => {
                 }
             }
         } catch (error) {
-            console.error('[AutoTranslator] Error:', error);
+            logger.error('[AutoTranslator] Error:', error);
         } finally {
             isTranslatingRef.current.delete(element);
         }
@@ -150,18 +151,18 @@ export const useAutoTranslator = (options: UseAutoTranslatorOptions = {}) => {
         
         // Only preload if online
         if (!isOnline()) {
-            console.log('[AutoTranslator] Offline - skipping preload');
+            logger.log('[AutoTranslator] Offline - skipping preload');
             hasPreloadedRef.current = true;
             return;
         }
 
         hasPreloadedRef.current = true;
         
-        console.log(`[AutoTranslator] Preloading common strings to ${currentLanguage.name}...`);
+        logger.log(`[AutoTranslator] Preloading common strings to ${currentLanguage.name}...`);
         await preloadCommonTranslations(COMMON_UI_STRINGS, currentLanguage.code);
         
         const size = await getTranslationVaultSize();
-        console.log(`[AutoTranslator] Vault size: ${size} translations`);
+        logger.log(`[AutoTranslator] Vault size: ${size} translations`);
     }, [currentLanguage]);
 
     /**

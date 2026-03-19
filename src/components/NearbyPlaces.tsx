@@ -12,6 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Eye, EyeOff } from "lucide-react";
+import { logger } from "@/utils/logger";
+import { useToast } from "@/hooks/use-toast";
+
 
 // Fix for default marker icon in Leaflet + Webpack/Vite
 // @ts-ignore
@@ -56,8 +59,10 @@ function ChangeView({ center }: { center: [number, number] }) {
 
 const NearbyPlaces = () => {
     const [location, setLocation] = useState<[number, number] | null>(null);
+    const { toast } = useToast();
     const [places, setPlaces] = useState<Place[]>([]);
     const [loading, setLoading] = useState(false);
+
     const [error, setError] = useState<string | null>(null);
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [homeLocation, setHomeLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -117,7 +122,11 @@ const NearbyPlaces = () => {
 
     const saveHomeBase = () => {
         if (location) {
-            const homeBase = { lat: location[0], lng: location[1], timestamp: Date.now() };
+            const homeBase = { 
+                lat: Math.round(location[0] * 1000) / 1000, 
+                lng: Math.round(location[1] * 1000) / 1000, 
+                timestamp: Date.now() 
+            };
             localStorage.setItem('user_home_base', JSON.stringify(homeBase));
             setHomeLocation(homeBase);
         }
@@ -145,12 +154,18 @@ const NearbyPlaces = () => {
             return;
         }
 
+        toast({
+            title: "Location Access",
+            description: "We use your location to find nearby hospitals, hotels, and services.",
+        });
+
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 setLocation([position.coords.latitude, position.coords.longitude]);
                 fetchNearbyPlaces(position.coords.latitude, position.coords.longitude);
             },
             (err) => {
+                logger.error("Geolocation error:", err);
                 setError("Please allow location access to see places nearby");
                 setLoading(false);
             },
@@ -158,13 +173,14 @@ const NearbyPlaces = () => {
         );
     };
 
+
     const fetchNearbyPlaces = async (lat: number, lon: number, category?: string) => {
         if (!showNearby) return;
         setLoading(true);
         setError(null);
         try {
             const radius = 3000;
-            
+
             // If a specific category is selected, only fetch that category
             // Otherwise, fetch all categories
             let queries: string;
@@ -520,16 +536,26 @@ const NearbyPlaces = () => {
                                     )}
 
                                     {location && filteredPlaces.length === 0 && !loading && (
-                                        <div className="text-center py-12 px-4 rounded-xl bg-muted/20 border border-dashed border-muted">
+                                        <div className="flex flex-col items-center justify-center text-center py-16 px-4 rounded-xl bg-muted/20 border border-dashed border-muted/60 mt-4">
+                                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm text-muted-foreground">
+                                                <MapPinOff className="w-8 h-8 opacity-50" />
+                                            </div>
+                                            <h4 className="font-semibold text-foreground mb-1">No Results Found</h4>
                                             <p className="text-sm text-muted-foreground">
-                                                No {activeCategory ? CATEGORIES[activeCategory as keyof typeof CATEGORIES].label : "places"} found in this area.
+                                                No {activeCategory ? CATEGORIES[activeCategory as keyof typeof CATEGORIES].label.toLowerCase() : "places"} found in this area. Try adjusting your location or category.
                                             </p>
                                         </div>
                                     )}
 
                                     {!location && !loading && (
-                                        <div className="text-center py-12 px-4 rounded-xl bg-muted/20 border border-dashed border-muted text-muted-foreground italic text-sm">
-                                            Please enable location to view results.
+                                        <div className="flex flex-col items-center justify-center text-center py-16 px-4 rounded-xl bg-muted/20 border border-dashed border-muted/60 mt-4">
+                                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm text-orange-400">
+                                                <MapPin className="w-8 h-8 opacity-80" />
+                                            </div>
+                                            <h4 className="font-semibold text-foreground mb-1">Location Permissions Needed</h4>
+                                            <p className="text-sm text-muted-foreground">
+                                                Please enable location access to discover places near you.
+                                            </p>
                                         </div>
                                     )}
 

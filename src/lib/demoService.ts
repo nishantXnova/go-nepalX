@@ -1,6 +1,6 @@
-
 import { cacheTrip } from "./offlineService";
 import { trackMetric } from "./metricsService";
+import { logger } from "@/utils/logger";
 
 const SAMPLE_TOURIST_DATA = {
     touristId: "NPL-2026-9999",
@@ -52,5 +52,5 @@ export const triggerDemoMode = () => {
     });
 
     // Notify user via console or a toast would be better but this is a lib
-    console.log("Demo Mode Activated: Data pre-filled.");
+    logger.log("Demo Mode Activated: Data pre-filled.");
 };

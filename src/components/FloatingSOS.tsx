@@ -8,13 +8,13 @@ const FloatingSOS = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="fixed bottom-6 right-6 z-[60] flex flex-col items-end gap-3 translate-x-0">
+        <div className="fixed bottom-6 left-6 z-[60] flex flex-col items-start gap-3 translate-x-0">
             <AnimatePresence>
                 {showTooltip && (
                     <motion.div
-                        initial={{ opacity: 0, x: 20, scale: 0.8 }}
+                        initial={{ opacity: 0, x: -20, scale: 0.8 }}
                         animate={{ opacity: 1, x: 0, scale: 1 }}
-                        exit={{ opacity: 0, x: 20, scale: 0.8 }}
+                        exit={{ opacity: 0, x: -20, scale: 0.8 }}
                         className="bg-red-700 text-white px-4 py-2 rounded-xl shadow-xl border border-red-500/50 text-sm font-bold flex items-center gap-2 whitespace-nowrap mb-1 backdrop-blur-md"
                     >
                         Emergency SOS Toolkit

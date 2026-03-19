@@ -6,6 +6,8 @@ import { getDestinationById } from "@/data/destinations";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/utils/logger";
+import { getSafeErrorMessage } from "@/utils/errorUtils";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DestinationReviews from "@/components/DestinationReviews";
@@ -51,7 +53,7 @@ const DestinationDetail = () => {
         setIsSaved(!!savedData);
       }
     } catch (error) {
-      console.error('Error checking saved status:', error);
+      logger.error('Error checking saved status:', error);
     }
   };
 
@@ -109,7 +111,7 @@ const DestinationDetail = () => {
         toast({ title: 'Added to saved places!' });
       }
     } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Error', description: error.message });
+      toast({ variant: 'destructive', title: 'Error', description: getSafeErrorMessage(error) });
     } finally {
       setSavingState(false);
     }
@@ -135,7 +137,7 @@ const DestinationDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="relative h-[60vh] min-h-[400px]">
         <div className="absolute inset-0">
@@ -146,7 +148,7 @@ const DestinationDetail = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/50 to-transparent" />
         </div>
-        
+
         <div className="absolute inset-0 flex items-end">
           <div className="container-wide pb-12">
             {/* Back Button */}
@@ -161,9 +163,8 @@ const DestinationDetail = () => {
                 variant="outline"
                 onClick={handleToggleSave}
                 disabled={savingState}
-                className={`border-primary-foreground/50 bg-transparent hover:bg-primary-foreground/10 ${
-                  isSaved ? 'text-nepal-gold border-nepal-gold' : 'text-primary-foreground'
-                }`}
+                className={`border-primary-foreground/50 bg-transparent hover:bg-primary-foreground/10 ${isSaved ? 'text-nepal-gold border-nepal-gold' : 'text-primary-foreground'
+                  }`}
               >
                 {savingState ? (
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -175,7 +176,7 @@ const DestinationDetail = () => {
                 {isSaved ? 'Saved' : 'Save'}
               </Button>
             </div>
-            
+
             <span className="inline-block bg-accent text-accent-foreground px-4 py-1.5 rounded-full text-sm font-medium mb-4">
               {destination.category}
             </span>
@@ -189,36 +190,36 @@ const DestinationDetail = () => {
       <section className="bg-card border-b border-border">
         <div className="container-wide py-6">
           <div className="flex flex-wrap gap-6 md:gap-12">
-            <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-accent" />
+            <div className="flex items-center gap-3">
+              <Clock className="h-5 w-5 text-accent shrink-0" />
               <div>
                 <p className="text-xs text-muted-foreground">Duration</p>
                 <p className="font-medium text-foreground">{destination.duration}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-accent" />
+            <div className="flex items-center gap-3">
+              <Calendar className="h-5 w-5 text-accent shrink-0" />
               <div>
                 <p className="text-xs text-muted-foreground">Best Time</p>
                 <p className="font-medium text-foreground">{destination.bestTime}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Mountain className="h-5 w-5 text-accent" />
+            <div className="flex items-center gap-3">
+              <Mountain className="h-5 w-5 text-accent shrink-0" />
               <div>
                 <p className="text-xs text-muted-foreground">Altitude</p>
                 <p className="font-medium text-foreground">{destination.altitude}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-accent" />
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-5 w-5 text-accent shrink-0" />
               <div>
                 <p className="text-xs text-muted-foreground">Difficulty</p>
                 <p className="font-medium text-foreground">{destination.difficulty}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Star className="h-5 w-5 fill-nepal-gold text-nepal-gold" />
+            <div className="flex items-center gap-3">
+              <Star className="h-5 w-5 fill-nepal-gold text-nepal-gold shrink-0" />
               <div>
                 <p className="text-xs text-muted-foreground">Rating</p>
                 <p className="font-medium text-foreground">{destination.rating} / 5</p>
@@ -229,7 +230,7 @@ const DestinationDetail = () => {
       </section>
 
       {/* Main Content */}
-      <section className="section-padding">
+      <section className="pt-12 pb-24">
         <div className="container-wide">
           <div className="grid lg:grid-cols-3 gap-12">
             {/* Left Column - Main Content */}

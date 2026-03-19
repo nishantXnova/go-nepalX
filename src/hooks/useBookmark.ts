@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/utils/logger';
+
 
 export function useBookmark(placeName: string, placeData?: {
   description?: string;
@@ -41,8 +43,9 @@ export function useBookmark(placeName: string, placeData?: {
         setIsSaved(!!savedData);
       }
     } catch (error) {
-      console.error('Error checking saved status:', error);
+      logger.error('Error checking saved status:', error);
     }
+
   };
 
   const toggleSave = useCallback(async () => {

@@ -6,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { useWeather } from "@/contexts/WeatherContext";
 import { GlassmorphicSkeleton } from "@/components/ui/GlassmorphicSkeleton";
 import { getCachedTrip, isWeatherStale } from "@/lib/offlineService";
+import { logger } from "@/utils/logger";
+import { useToast } from "@/hooks/use-toast";
+
 
 interface WeatherData {
     temperature: number;
@@ -25,7 +28,9 @@ interface LocationSuggestion {
 
 const WeatherForecast = () => {
     const { isOpen, closeWeather } = useWeather();
+    const { toast } = useToast();
     const [weather, setWeather] = useState<WeatherData | null>(null);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [recommendation, setRecommendation] = useState<string>("");
@@ -120,8 +125,9 @@ const WeatherForecast = () => {
                         const geoData = await geoResponse.json();
                         locationName = geoData.address.city || geoData.address.town || geoData.address.village || "Unknown Location";
                     } catch (e) {
-                        console.error("Geocoding error:", e);
+                        logger.error("Geocoding error:", e);
                     }
+
                 }
 
                 const weatherData: WeatherData = {
@@ -140,8 +146,9 @@ const WeatherForecast = () => {
                 setShowSuggestions(false);
             }
         } catch (err) {
-            console.error("Weather fetch error:", err);
+            logger.error("Weather fetch error:", err);
             setError("Failed to fetch weather data.");
+
         } finally {
             setLoading(false);
         }
@@ -149,12 +156,17 @@ const WeatherForecast = () => {
 
     const getLocation = () => {
         if ("geolocation" in navigator) {
+            toast({
+                title: "Location Access",
+                description: "We use your location to provide accurate weather for your current area.",
+            });
+
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     fetchWeather(position.coords.latitude, position.coords.longitude, undefined, true);
                 },
                 (err) => {
-                    console.error("Geolocation error:", err);
+                    logger.error("Geolocation error:", err);
                     fetchWeather(27.7172, 85.3240, "Kathmandu", false); // Fallback
                     setError("Location access denied. Showing Kathmandu.");
                 }
@@ -163,6 +175,7 @@ const WeatherForecast = () => {
             fetchWeather(27.7172, 85.3240, "Kathmandu", false);
         }
     };
+
 
     // Debounced Search Handler
     useEffect(() => {
@@ -177,8 +190,9 @@ const WeatherForecast = () => {
                     setSuggestions(data);
                     setShowSuggestions(true);
                 } catch (e) {
-                    console.error("Search error:", e);
+                    logger.error("Search error:", e);
                     setSuggestions([]);
+
                 } finally {
                     setIsSearching(false);
                 }

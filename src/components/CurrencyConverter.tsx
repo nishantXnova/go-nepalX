@@ -4,7 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { getCachedRates, getDefaultRates } from "@/lib/currencyCache";
+import { getCachedRates, getDefaultRates, RatesWithMeta } from "@/lib/currencyCache";
+import { logger } from "@/utils/logger";
+import { getSafeErrorMessage } from "@/utils/errorUtils";
+import { AlertCircle, WifiOff } from "lucide-react";
 
 const currencies = [
   { code: "NPR", name: "Nepalese Rupee", flag: "🇳🇵" },
@@ -23,17 +26,9 @@ const currencies = [
 const rateCache: Record<string, { rates: Record<string, number>; ts: number }> = {};
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
-async function fetchRates(baseCurrency: string): Promise<Record<string, number>> {
+async function fetchRatesWithMeta(baseCurrency: string): Promise<RatesWithMeta> {
   const key = baseCurrency.toLowerCase();
-
-  // Try to get from offline cache first
-  const cachedRates = await getCachedRates(key);
-  if (cachedRates && Object.keys(cachedRates).length > 0) {
-    return cachedRates;
-  }
-  
-  // Fallback to default rates if completely offline
-  return getDefaultRates();
+  return await getCachedRates(key);
 }
 
 const CurrencyConverter = () => {
@@ -57,24 +52,41 @@ const CurrencyConverter = () => {
 
     setLoading(true);
     try {
-      const rates = await fetchRates(from);
-      const toKey = to.toLowerCase();
-      const exchangeRate = rates[toKey];
-
-      if (exchangeRate == null) {
-        throw new Error(`Rate for ${from} to ${to} is not available.`);
-      }
+      const meta = await fetchRatesWithMeta(from);
+      
+      // Fix 10: Check data age
+      const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
+      const isStale = meta.timestamp > 0 && (Date.now() - meta.timestamp > threeDaysInMs);
+      const isOldDefault = meta.isDefault || meta.timestamp === 0;
 
       if (!isMounted.current) return;
+
+      if (isStale || isOldDefault) {
+        toast({
+          title: isOldDefault ? "Using Offline Rates" : "Rates may be outdated",
+          description: isOldDefault 
+            ? "Connect to the internet to get live exchange rates." 
+            : "These rates are more than 3 days old. Use for estimation only.",
+          variant: isOldDefault ? "default" : "destructive",
+        });
+      }
+
+      const toKey = to.toLowerCase();
+      const exchangeRate = meta.rates[toKey];
+
+      if (exchangeRate == null) {
+        throw new Error(`Rate for ${from} to ${to} is not available offline.`);
+      }
 
       const converted = (numericAmount * exchangeRate).toFixed(2);
       setRate(exchangeRate);
       setResult(converted);
     } catch (err: any) {
       if (!isMounted.current) return;
+      logger.error("Conversion error:", err);
       toast({
         title: "Conversion failed",
-        description: err?.message || "Something went wrong. Please try again.",
+        description: getSafeErrorMessage(err),
         variant: "destructive",
       });
     } finally {
@@ -184,7 +196,7 @@ const CurrencyConverter = () => {
             <Button
               onClick={convert}
               disabled={loading}
-              className="w-full h-12 btn-accent text-lg font-semibold rounded-xl"
+              className="w-full h-12 bg-[#FB923C] hover:bg-[#E86C35] text-white text-lg font-semibold rounded-xl transition-colors"
             >
               {loading ? (
                 <RefreshCw className="h-5 w-5 animate-spin mr-2" />

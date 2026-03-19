@@ -1,13 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://go-nepal.vercel.app',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Fix 5: Verify Authorization Header
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader) {
+    return new Response(
+      JSON.stringify({ error: 'Authorization header is missing' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 
   try {

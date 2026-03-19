@@ -1,4 +1,5 @@
 import Dexie, { Table } from 'dexie';
+import { logger } from '@/utils/logger';
 
 /**
  * News Cache - IndexedDB storage for offline news
@@ -44,7 +45,7 @@ export const cacheNews = async (items: CachedNewsItem[]): Promise<void> => {
     }));
     
     await newsCache.news.bulkAdd(itemsWithTimestamp);
-    console.log(`[NewsCache] Cached ${items.length} news items`);
+    logger.log(`[NewsCache] Cached ${items.length} news items`);
 };
 
 /**

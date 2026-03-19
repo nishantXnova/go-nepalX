@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
+import { logger } from '@/utils/logger';
 
 interface AuthContextType {
   user: User | null;
@@ -70,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       };
     } catch (error) {
       // If Supabase fails (e.g., rate limit), still allow app to load
-      console.warn('Auth initialization failed:', error);
+      logger.warn('Auth initialization failed:', error);
       if (isMounted) setLoading(false);
     }
   }, []);
@@ -91,42 +92,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       });
 
-      console.log('Signup response:', { data, error });
-
-      // Check for rate limit error - if rate limited, create profile anyway
-      if (error?.message?.toLowerCase().includes('rate limit')) {
-        console.log('Rate limited - creating profile anyway');
-        if (data.user) {
-          try {
-            await supabase.from('profiles').upsert({
-              id: data.user.id,
-              full_name: fullName,
-              role: 'Tourist',
-              email: email
-            }, { onConflict: 'id' });
-          } catch (profileError) {
-            console.error('Profile creation error:', profileError);
-          }
-        }
-        return { error: null }; // Return success to allow user to continue
-      }
-
-      if (!error && data.user) {
-        const { error: profileError } = await supabase.from('profiles').upsert({
-          id: data.user.id,
-          full_name: fullName,
-          role: 'Tourist',
-          email: email
-        }, { onConflict: 'id' });
-
-        if (profileError) {
-          console.error('Error creating profile:', profileError);
-        }
-      }
+      logger.log('Signup response:', { data, error });
 
       return { error };
     } catch (error) {
-      console.error('Signup error:', error);
+      logger.error('Signup error:', error);
       return { error: error as Error };
     }
   };

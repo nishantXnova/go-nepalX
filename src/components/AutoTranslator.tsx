@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translateText, preloadCommonTranslations, getTranslationVaultSize } from "@/lib/translationService";
 import { isOnline } from "@/lib/translationVault";
+import { logger } from "@/utils/logger";
 
 const COMMON_UI_STRINGS = [
     // Navigation
@@ -93,7 +94,7 @@ const AutoTranslator = () => {
                 if (node.parentElement) node.parentElement.dataset.translated = "true";
             }
         } catch (error) {
-            console.error("Auto-translation error for node:", error);
+            logger.error("Auto-translation error for node:", error);
         }
     };
 
@@ -112,20 +113,20 @@ const AutoTranslator = () => {
         
         // Only preload if online - this primes the Dexie vault
         if (!isOnline()) {
-            console.log('[AutoTranslator] Offline - skipping preload, will use cached translations');
+            logger.log('[AutoTranslator] Offline - skipping preload, will use cached translations');
             hasPreloadedRef.current = true;
             return;
         }
 
         hasPreloadedRef.current = true;
         
-        console.log(`[AutoTranslator] Preloading common strings to ${currentLanguage.name}...`);
+        logger.log(`[AutoTranslator] Preloading common strings to ${currentLanguage.name}...`);
         
         // Preload translations to Dexie vault for offline use
         await preloadCommonTranslations(COMMON_UI_STRINGS, currentLanguage.code);
         
         const size = await getTranslationVaultSize();
-        console.log(`[AutoTranslator] Translation vault now contains ${size} cached translations`);
+        logger.log(`[AutoTranslator] Translation vault now contains ${size} cached translations`);
     };
 
     useEffect(() => {

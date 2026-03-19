@@ -16,6 +16,7 @@ import {
     isOnline,
     getVaultSize 
 } from "./translationVault";
+import { logger } from "@/utils/logger";
 
 export interface TranslationResult {
     text: string;
@@ -63,9 +64,9 @@ const saveToVault = async (
             timestamp: Date.now()
         });
         savedToVault.add(cacheKey);
-        console.log(`[TranslationVault] Saved: ${originalText.substring(0, 30)}... -> ${translatedText.substring(0, 30)}...`);
+        logger.log(`[TranslationVault] Saved: ${originalText.substring(0, 30)}... -> ${translatedText.substring(0, 30)}...`);
     } catch (error) {
-        console.error('[TranslationVault] Error saving:', error);
+        logger.error('[TranslationVault] Error saving:', error);
     }
 };
 
@@ -86,7 +87,7 @@ const getFromVault = async (
             return entry.translatedText;
         }
     } catch (error) {
-        console.error('[TranslationVault] Error reading:', error);
+        logger.error('[TranslationVault] Error reading:', error);
     }
     return undefined;
 };
@@ -164,7 +165,7 @@ export const translateText = async (
 
         throw new Error("Invalid response format from translation service");
     } catch (error) {
-        console.error("Translation error:", error);
+        logger.error("Translation error:", error);
         return text; // Fallback to original text on error
     }
 };
@@ -188,12 +189,12 @@ export const preloadCommonTranslations = async (
     commonStrings: string[],
     to: string = "ne"
 ): Promise<void> => {
-    console.log(`[TranslationVault] Preloading ${commonStrings.length} common strings to ${to}...`);
+    logger.log(`[TranslationVault] Preloading ${commonStrings.length} common strings to ${to}...`);
     
     for (const text of commonStrings) {
         await translateText(text, "en", to);
     }
     
     const size = await getVaultSize();
-    console.log(`[TranslationVault] Vault now contains ${size} translations`);
+    logger.log(`[TranslationVault] Vault now contains ${size} translations`);
 };

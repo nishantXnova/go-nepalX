@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/logger';
+import { getSafeErrorMessage } from '@/utils/errorUtils';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link, useNavigate } from 'react-router-dom';
@@ -44,7 +46,7 @@ const Profile = () => {
       setProfile(data);
       setFullName(data.full_name || '');
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      logger.error('Error fetching profile:', error);
     } finally {
       setLoading(false);
     }
@@ -91,7 +93,7 @@ const Profile = () => {
       toast({
         variant: 'destructive',
         title: 'Upload failed',
-        description: error.message,
+        description: getSafeErrorMessage(error),
       });
     } finally {
       setUploading(false);
@@ -118,7 +120,7 @@ const Profile = () => {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: error.message,
+        description: getSafeErrorMessage(error),
       });
     } finally {
       setSaving(false);

@@ -1,4 +1,5 @@
 import { cacheNews, getCachedNews, CachedNewsItem } from './newsCache';
+import { logger } from '@/utils/logger';
 
 export interface NewsItem {
     title: string;
@@ -80,10 +81,10 @@ export const fetchAlerts = async (): Promise<NewsItem[]> => {
 export const fetchNepalNews = async (): Promise<NewsItem[]> => {
     // If offline, try to get from cache
     if (!isOnline()) {
-        console.log('[News] Offline - fetching from cache');
+        logger.log('[News] Offline - fetching from cache');
         const cached = await getCachedNews();
         if (cached.length > 0) {
-            console.log(`[News] Found ${cached.length} cached items`);
+            logger.log(`[News] Found ${cached.length} cached items`);
             return cached.map(item => ({
                 title: item.title,
                 link: item.link,
@@ -94,7 +95,7 @@ export const fetchNepalNews = async (): Promise<NewsItem[]> => {
                 lastUpdated: item.lastUpdated + ' (offline)'
             }));
         }
-        console.log('[News] No cached news available');
+        logger.log('[News] No cached news available');
         return [];
     }
 
@@ -107,7 +108,7 @@ export const fetchNepalNews = async (): Promise<NewsItem[]> => {
             const data = await response.json();
             if (data.status !== 'ok' || !data.items?.length) continue;
 
-            console.info(`[News] Loaded from: ${source.name}`);
+            logger.info(`[News] Loaded from: ${source.name}`);
             const newsItems = mapItems(data.items, source.name);
             
             // Cache the news for offline use
@@ -115,12 +116,12 @@ export const fetchNepalNews = async (): Promise<NewsItem[]> => {
             
             return newsItems;
         } catch (err) {
-            console.warn(`[News] Failed source ${source.name}:`, err);
+            logger.warn(`[News] Failed source ${source.name}:`, err);
         }
     }
 
     // If all sources fail, try cache as fallback
-    console.log('[News] All sources failed - trying cache');
+    logger.log('[News] All sources failed - trying cache');
     const cached = await getCachedNews();
     if (cached.length > 0) {
         return cached.map(item => ({
@@ -134,7 +135,7 @@ export const fetchNepalNews = async (): Promise<NewsItem[]> => {
         }));
     }
 
-    console.error('[News] All sources failed.');
+    logger.error('[News] All sources failed.');
     return [];
 };
 

@@ -59,11 +59,25 @@ export const EMERGENCY_PHRASES = [
 ];
 
 export const cacheTrip = (data: Omit<CachedTripData, "timestamp" | "emergencyPhrases">) => {
+    // Fix 1: Round coordinates to 3 decimal places
+    const homeCoords = data.homeCoords ? {
+        ...data.homeCoords,
+        lat: Math.round(data.homeCoords.lat * 1000) / 1000,
+        lng: Math.round(data.homeCoords.lng * 1000) / 1000,
+    } : data.homeCoords;
+
     const fullData: CachedTripData = {
         ...data,
+        homeCoords,
         emergencyPhrases: EMERGENCY_PHRASES,
         timestamp: Date.now(),
     };
+
+    // Fix 2: Strip digitalID before storing
+    if (fullData.digitalID) {
+        delete fullData.digitalID;
+    }
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(fullData));
 };
 

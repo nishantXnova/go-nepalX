@@ -78,7 +78,7 @@ const Destinations = () => {
             >
               <Link
                 to={`/destination/${destination.id}`}
-                className="relative bg-card rounded-3xl overflow-hidden shadow-soft hover:shadow-elevated block transition-all duration-700 border border-white/5"
+                className="relative bg-card rounded-3xl overflow-hidden shadow-soft hover:shadow-2xl flex flex-col h-full transition-all duration-500 border border-white/5"
               >
                 {/* Image */}
                 <div className="relative h-80 overflow-hidden">
@@ -127,7 +127,7 @@ const Destinations = () => {
                 </div>
 
                 {/* Content */}
-                <div className="p-8 pb-10">
+                <div className="p-8 pb-10 flex-1 flex flex-col">
                   {/* Meta Info */}
                   <div className="flex items-center gap-6 mb-8 border-b border-white/5 pb-6">
                     <div className="flex items-center gap-2 text-muted-foreground/80">
@@ -153,7 +153,7 @@ const Destinations = () => {
                   </div>
 
                   {/* CTA */}
-                  <div className="relative overflow-hidden rounded-full transition-all duration-500">
+                  <div className="relative overflow-hidden rounded-full transition-all mt-auto duration-500">
                     <Button className="w-full btn-primary py-7 text-sm uppercase tracking-[0.2em] font-bold group-hover:tracking-[0.3em] transition-all duration-500">
                       Discover Details
                     </Button>

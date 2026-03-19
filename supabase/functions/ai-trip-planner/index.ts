@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://go-nepal.vercel.app',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
@@ -15,6 +15,15 @@ interface TripPlannerRequest {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Fix 5: Verify Authorization Header
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader) {
+    return new Response(
+      JSON.stringify({ success: false, error: 'Authorization header is missing' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 
   try {

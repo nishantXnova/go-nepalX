@@ -24,12 +24,16 @@ const Auth = lazy(() => import("./pages/Auth"));
 const SignupSuccess = lazy(() => import("./pages/SignupSuccess"));
 const Profile = lazy(() => import("./pages/Profile"));
 const SavedPlaces = lazy(() => import("./pages/SavedPlaces"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const NewsPage = lazy(() => import("./pages/NewsPage"));
 const DigitalTouristID = lazy(() => import("./pages/DigitalTouristID"));
 const Trails = lazy(() => import("./pages/Trails"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const SharedItinerary = lazy(() => import("./pages/SharedItinerary"));
+import GuideSignup from "./pages/GuideSignup";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -77,19 +81,16 @@ const AnimatedRoutes = () => {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requireAdmin>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="/test-auth" element={<TestAuth />} />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/tourist-id" element={<DigitalTouristID />} />
           <Route path="/trails" element={<Trails />} />
+          <Route path="/guide-signup" element={<GuideSignup />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/itinerary/:id" element={<SharedItinerary />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

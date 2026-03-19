@@ -124,67 +124,71 @@ const StatsBar: React.FC = () => {
   };
 
   return (
-    <div
-      ref={ref}
-      className="w-full py-12 md:py-16 px-4"
-      style={{ backgroundColor: '#F5F0E8' }}
-    >
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-0">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className={`flex flex-col items-center transition-all duration-700 ease-out relative w-full md:w-auto ${
-                isVisible
+    <div className="relative">
+      {/* Smooth transition gradient from Hero (black) to StatsBar (cream) */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black to-[#F5F0E8] pointer-events-none" style={{ marginTop: '-1px' }} />
+
+      <div
+        ref={ref}
+        className="w-full py-16 md:py-20 px-4 relative z-10"
+        style={{ backgroundColor: '#F5F0E8' }}
+      >
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-0">
+            {stats.map((stat, index) => (
+              <div
+                key={index}
+                className={`flex flex-col items-center transition-all duration-700 ease-out relative w-full md:w-auto ${isVisible
                   ? 'opacity-100 translate-y-0'
                   : 'opacity-0 translate-y-8'
-              }`}
-              style={{
-                transitionDelay: isVisible ? `${index * 150}ms` : '0ms',
-              }}
-            >
-              {/* Container with padding for divider */}
-              <div className="px-4 md:px-8 lg:px-10 w-full">
-                {/* Number */}
-                <span
-                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif tracking-tight block text-center"
-                  style={{ color: '#C2692A' }}
-                >
-                  {formatNumber(counts[index], stat.suffix)}
-                </span>
+                  }`}
+                style={{
+                  transitionDelay: isVisible ? `${index * 150}ms` : '0ms',
+                }}
+              >
+                {/* Container with padding for divider */}
+                <div className="px-4 md:px-8 lg:px-10 w-full">
+                  {/* Number */}
+                  <span
+                    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif tracking-tight block text-center"
+                    style={{ color: '#C2692A' }}
+                  >
+                    {formatNumber(counts[index], stat.suffix)}
+                  </span>
 
-                {/* Label */}
-                <span
-                  className="mt-2 text-xs sm:text-sm md:text-base font-medium tracking-wide uppercase whitespace-nowrap block text-center"
-                  style={{ color: '#1C2B3A' }}
-                >
-                  {translatedLabels[index]}
-                </span>
+                  {/* Label */}
+                  <span
+                    className="mt-2 text-xs sm:text-sm md:text-base font-medium tracking-wide uppercase whitespace-nowrap block text-center"
+                    style={{ color: '#1C2B3A' }}
+                  >
+                    {translatedLabels[index]}
+                  </span>
+                </div>
+
+                {/* Vertical Divider (hidden on last item and on mobile) */}
+                {index < stats.length - 1 && (
+                  <div
+                    className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-10 md:h-12 w-px"
+                    style={{
+                      backgroundColor: '#1C2B3A',
+                      opacity: 0.15,
+                    }}
+                  />
+                )}
+
+                {/* Horizontal Divider (visible only on mobile between items) */}
+                {index < stats.length - 1 && (
+                  <div
+                    className="md:hidden w-16 h-px my-6"
+                    style={{
+                      backgroundColor: '#1C2B3A',
+                      opacity: 0.15,
+                    }}
+                  />
+                )}
               </div>
-
-              {/* Vertical Divider (hidden on last item and on mobile) */}
-              {index < stats.length - 1 && (
-                <div
-                  className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-10 md:h-12 w-px"
-                  style={{
-                    backgroundColor: '#1C2B3A',
-                    opacity: 0.15,
-                  }}
-                />
-              )}
-
-              {/* Horizontal Divider (visible only on mobile between items) */}
-              {index < stats.length - 1 && (
-                <div
-                  className="md:hidden w-16 h-px my-6"
-                  style={{
-                    backgroundColor: '#1C2B3A',
-                    opacity: 0.15,
-                  }}
-                />
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>

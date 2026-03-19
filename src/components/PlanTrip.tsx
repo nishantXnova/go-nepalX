@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Calendar, Users, DollarSign, Filter, Loader2, Sparkles, X, Hotel, Save, Share2 } from "lucide-react";
+import { Search, Calendar, Users, DollarSign, Filter, Loader2, Sparkles, X, Hotel, Download, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/utils/logger";
+import { getSafeErrorMessage } from "@/utils/errorUtils";
 import { parseMarkdown, cleanLatexText } from "@/lib/markdownParser";
 
 const interests = ["Adventure", "Culture", "Nature", "Spirituality", "Family"];
@@ -95,11 +97,11 @@ const PlanTrip = () => {
         throw new Error(data.error || 'Failed to generate itinerary');
       }
     } catch (error: any) {
-      console.error('Trip planner error:', error);
+      logger.error('Trip planner error:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to generate itinerary. Please try again.",
+        description: getSafeErrorMessage(error),
       });
     } finally {
       setIsLoading(false);
@@ -171,27 +173,59 @@ const PlanTrip = () => {
                     variant="default"
                     className="flex-1 bg-orange-600 hover:bg-orange-700 text-white rounded-xl py-6"
                     onClick={() => {
-                      toast({
-                        title: "Coming Soon",
-                        description: "Save to My Account feature is being finalized!",
-                      });
+                        const blob = new Blob([itinerary], { type: 'text/markdown;charset=utf-8' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `GoNepal-Trip-Plan-${new Date().toISOString().split('T')[0]}.md`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        toast({
+                          title: "Downloaded Successfully",
+                          description: "Your plan has been saved as a Markdown file.",
+                        });
                     }}
                   >
-                    <Save className="w-4 h-4 mr-2" />
-                    Save to My Account
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Plan
                   </Button>
                   <Button
                     variant="outline"
-                    className="flex-1 border-orange-200 text-orange-700 hover:bg-orange-50 rounded-xl py-6"
-                    onClick={() => {
-                      navigator.clipboard.writeText(window.location.href);
-                      toast({
-                        title: "Link Copied!",
-                        description: "Shareable link has been copied to your clipboard.",
-                      });
+                    className="flex-1 border-orange-200 text-orange-700 hover:bg-orange-50 rounded-xl py-6 relative"
+                    disabled={isLoading}
+                    onClick={async () => {
+                      setIsLoading(true);
+                      try {
+                         const { data, error } = await supabase
+                           .from('shared_itineraries' as any)
+                           .insert([{ itinerary_text: itinerary }])
+                           .select('id')
+                           .single();
+                           
+                         if (error) throw error;
+                         
+                         const shareUrl = `${window.location.origin}/itinerary/${data.id}`;
+                         await navigator.clipboard.writeText(shareUrl);
+                         
+                         toast({
+                           title: "Link Copied!",
+                           description: "A unique public shareable link has been copied to your clipboard.",
+                         });
+                      } catch (err: any) {
+                        toast({
+                          variant: "destructive",
+                          title: "Sharing Failed",
+                          description: err.message || "Could not generate share link.",
+                        });
+                      } finally {
+                        setIsLoading(false);
+                      }
                     }}
                   >
-                    <Share2 className="w-4 h-4 mr-2" />
+                    {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Share2 className="w-4 h-4 mr-2" />}
                     Share Link
                   </Button>
                 </div>
@@ -360,7 +394,8 @@ const PlanTrip = () => {
               >
                 <Button
                   size="lg"
-                  className="w-full btn-accent text-lg py-6"
+                  className="w-full text-lg py-6 text-white font-semibold transition-colors disabled:opacity-50 disabled:bg-gray-400"
+                  style={{ backgroundColor: (!selectedInterest || !selectedDuration || isLoading) ? undefined : '#FB923C' }}
                   disabled={!selectedInterest || !selectedDuration || isLoading}
                   onClick={handleGenerateItinerary}
                 >

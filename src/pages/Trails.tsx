@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { getSafeErrorMessage } from "@/utils/errorUtils";
 
 interface TrailReport {
     id: string;
@@ -67,7 +68,7 @@ const Trails = () => {
             toast({
                 variant: "destructive",
                 title: "Missing Information",
-                description: "Please provide both trail name and your report.",
+                description: getSafeErrorMessage("Please provide both trail name and your report."),
             });
             return;
         }

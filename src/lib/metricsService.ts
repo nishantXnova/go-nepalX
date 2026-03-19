@@ -1,5 +1,6 @@
+import { logger } from "@/utils/logger";
 
-type MetricType = 'translation_request' | 'translation_cache_hit' | 'translation_cache_miss' | 'offline_access' | 'page_load' | 'api_call';
+type MetricType = 'translation_request' | 'translation_cache_hit' | 'translation_cache_miss' | 'offline_access' | 'page_load' | 'api_call' | 'translation_vault_hit' | 'translation_memory_cache_hit' | 'translation_offline_fallback';
 
 interface SystemInfo {
     cpuCores: number;
@@ -201,7 +202,7 @@ export const trackMetric = (type: MetricType, value?: any) => {
     notifyListeners();
 
     // Also log to console for quick judge visibility
-    console.log(`[Metric] ${type}:`, metrics);
+    logger.log(`[Metric] ${type}:`, metrics);
 };
 
 export const getMetrics = () => ({ ...metrics, systemInfo: { ...metrics.systemInfo } });
@@ -263,7 +264,7 @@ if (typeof window !== 'undefined') {
             });
             observer.observe({ type: 'paint', buffered: true });
         } catch (e) {
-            console.log('[Performance] FCP observer not supported');
+            logger.log('[Performance] FCP observer not supported');
         }
     }
     

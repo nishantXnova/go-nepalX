@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/logger';
+import { getSafeErrorMessage } from '@/utils/errorUtils';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
@@ -63,7 +65,7 @@ const SavedPlaces = () => {
       const validPlaces = (data || []).filter(sp => sp.place !== null) as SavedPlace[];
       setSavedPlaces(validPlaces);
     } catch (error) {
-      console.error('Error fetching saved places:', error);
+      logger.error('Error fetching saved places:', error);
     } finally {
       setLoading(false);
     }
@@ -81,7 +83,7 @@ const SavedPlaces = () => {
       setSavedPlaces(prev => prev.filter(sp => sp.id !== savedPlaceId));
       toast({ title: 'Place removed from saved list' });
     } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Error', description: error.message });
+      toast({ variant: 'destructive', title: 'Error', description: getSafeErrorMessage(error) });
     }
   };
 

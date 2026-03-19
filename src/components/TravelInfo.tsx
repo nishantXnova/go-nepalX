@@ -117,10 +117,10 @@ const TravelInfo = () => {
                     value={`${category.title}-${index}`}
                     className="border border-border rounded-lg px-4"
                   >
-                    <AccordionTrigger className="text-left text-foreground hover:text-accent hover:no-underline py-4">
+                    <AccordionTrigger className="text-left py-3 text-foreground hover:text-accent hover:no-underline font-medium">
                       {item.question}
                     </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground pb-4">
+                    <AccordionContent className="text-muted-foreground pb-3 text-sm leading-relaxed">
                       {item.answer}
                     </AccordionContent>
                   </AccordionItem>

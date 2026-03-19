@@ -1,4 +1,6 @@
 import Dexie, { Table } from 'dexie';
+import { logger } from '@/utils/logger';
+
 
 /**
  * Currency Cache - Offline currency rates
@@ -40,19 +42,54 @@ const DEFAULT_RATES: Record<string, number> = {
     lkr: 325.0,
 };
 
-export const getCachedRates = async (key: string = 'usd'): Promise<Record<string, number>> => {
+export interface RatesWithMeta {
+    rates: Record<string, number>;
+    timestamp: number;
+    isDefault?: boolean;
+}
+
+export const getCachedRates = async (key: string = 'usd'): Promise<RatesWithMeta> => {
     // Try cache first
     const cached = await currencyCache.currencies.where('key').equals(key).first();
     
     if (cached) {
-        // Check if less than 1 hour old
+        // Check if less than 1 hour old for background refresh logic (not used here yet)
         const hourInMs = 60 * 60 * 1000;
-        if (Date.now() - cached.cachedAt < hourInMs) {
-            return cached.rates;
+        
+        // If online, fetch fresh rates
+        if (typeof navigator !== 'undefined' && navigator.onLine && (Date.now() - cached.cachedAt > hourInMs)) {
+            try {
+                const urls = [
+                    `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${key}.min.json`,
+                    `https://latest.currency-api.pages.dev/v1/currencies/${key}.min.json`,
+                ];
+                
+                for (const url of urls) {
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data[key]) {
+                            // Cache the rates
+                            const now = Date.now();
+                            await currencyCache.currencies.put({
+                                key,
+                                rates: data[key],
+                                cachedAt: now
+                            });
+                            return { rates: data[key], timestamp: now };
+                        }
+                    }
+                }
+            } catch (e) {
+                logger.warn('Currency fetch failed:', e);
+            }
+
         }
+        
+        return { rates: cached.rates, timestamp: cached.cachedAt };
     }
     
-    // If online, fetch fresh rates
+    // If online and no cache, fetch fresh rates
     if (typeof navigator !== 'undefined' && navigator.onLine) {
         try {
             const urls = [
@@ -65,24 +102,25 @@ export const getCachedRates = async (key: string = 'usd'): Promise<Record<string
                 if (response.ok) {
                     const data = await response.json();
                     if (data[key]) {
+                        const now = Date.now();
                         // Cache the rates
                         await currencyCache.currencies.put({
                             key,
                             rates: data[key],
-                            cachedAt: Date.now()
+                            cachedAt: now
                         });
-                        return data[key];
+                        return { rates: data[key], timestamp: now };
                     }
                 }
             }
         } catch (e) {
-            console.warn('Currency fetch failed:', e);
+            logger.warn('Currency fetch failed:', e);
         }
+
     }
     
-    // Return cached or default
-    if (cached) return cached.rates;
-    return DEFAULT_RATES;
+    // Return default
+    return { rates: DEFAULT_RATES, timestamp: 0, isDefault: true };
 };
 
 export const getDefaultRates = () => DEFAULT_RATES;

@@ -147,13 +147,13 @@ const Partners = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6"
+          className="flex flex-wrap justify-center gap-6"
         >
           {partnerCategories.map((category) => (
             <motion.div
               key={category.title}
               variants={itemVariants}
-              className="relative bg-card rounded-2xl p-6 border border-border transition-all duration-300 flex flex-col h-full min-h-[300px] group hover:shadow-lg hover:-translate-y-6"
+              className="relative w-full md:w-[calc(50%-1.5rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm bg-card rounded-2xl p-6 border border-border transition-all duration-300 flex flex-col h-full min-h-[300px] group hover:shadow-lg hover:-translate-y-6"
             >
               {/* Top border that appears on hover */}
               <div

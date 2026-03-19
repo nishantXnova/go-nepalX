@@ -225,8 +225,8 @@ Get the project running on your machine in under 2 minutes:
 
 1. **Clone & Navigate**
    ```bash
-   git clone https://github.com/nishantXnova/Main-hackathon.git
-   cd Main-hackathon
+   git clone https://github.com/nishantXnova/go-nepalX.git
+   cd go-nepalX
    ```
 
 2. **Dependency Installation**
@@ -260,16 +260,35 @@ Add the following columns to your `profiles` table to persist onboarding and tra
 - **`onboarding_completed`**: `boolean` (Default: `false`)
 - **`preferences`**: `jsonb` (To store interests and trekker level)
 
-### 2. AI Prompt Logic & Navigation
+Create the `shared_itineraries` table to enable AI Trip sharing:
+```sql
+CREATE TABLE IF NOT EXISTS public.shared_itineraries (
+  id uuid default gen_random_uuid() primary key,
+  itinerary_text text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+ALTER TABLE public.shared_itineraries ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can insert shared itineraries" ON public.shared_itineraries FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public can read shared itineraries" ON public.shared_itineraries FOR SELECT USING (true);
+```
+
+### 2. Major Feature Additions & Security Hardening
+- **Shareable AI Itineraries**: Users can now instantly generate unique, public sharing links (`/itinerary/:id`) backed by the Supabase database.
+- **Offline Markdown Downloads**: The AI Trip Planner supports native `.md` file downloads for offline viewing.
+- **Privacy & Security Framework**: 
+  - **GDPR Compliance**: Added dedicated Privacy Policy (`/privacy`) and Terms of Service (`/terms`).
+  - **Data Cleansing**: The Trekker's Offline Toolkit strictly strips sensitive `digitalID` KYC PII before caching, and rounds GPS coordinates to 3 decimal places to prevent exact user pinpointing.
+  - **Explicit Consent**: Integrated navigator geolocation consent flows before accessing GPS data.
+- **Edge Function Security**: Supabase Edge Functions (Chatbot, Currency Converter, Trip Planner) now utilize strict JWT payload verification and enforce `https://go-nepal.vercel.app` CORS origins.
+- **Digital Tourist ID Simulation**: Now includes an explicit disclaimer that GoNepal is in testing to protect users from submitting real passport data. 
+- **Premium UI Overhaul**: The Authentication module has been transformed with native glassmorphism, dynamic animations, and branding-aligned terracotta button gradients against a majestic Machhapuchhre peak backdrop.
+- **Floating Utilities**: The SOS button has been relocated to the bottom-left to ensure zero overlap with the AI Chatbot.
+
+### 3. AI Prompt Logic & Navigation
 The AI Trip Planner and Chatbot have been updated with the following behavioral rules:
 - **No Competitors**: Mentions of "Maps.me" are replaced with "GoNepal Offline Toolkit".
 - **No Specific Hotels**: Recommendations now focus on "budget guesthouses in [area]" to maintain neutrality and safety.
 - **Fixed Navigation**: All "Book with Confidence" and "Real Hotels" links now use internal hash-based routing (`/#flights`, `/#nearby-places`, `/#experiences`) to prevent 404 errors.
-
-### 3. New Features
-- **SOS Button**: A persistent floating 🛡️ button is now available site-wide. It now redirects directly to the **Offline Toolkit** within the Digital Tourist ID for instant emergency access.
-- **Trail Board**: A live community-driven conditions board is available at `/trails`.
-- **Onboarding**: New users are now greeted with a 3-step personalization flow.
 
 ---
 *Developed with Passion & Pride by Team Valley for the Nepal Tourism Hackathon.*

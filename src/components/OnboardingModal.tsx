@@ -24,18 +24,6 @@ const OnboardingModal = () => {
     const handleComplete = async () => {
         localStorage.setItem('gonepal_onboarding_seen', 'true');
         setIsOpen(false);
-
-        // Optional: Save to Supabase if user is logged in
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-            await supabase
-                .from('profiles')
-                .update({
-                    onboarding_completed: true,
-                    preferences: preferences
-                })
-                .eq('id', user.id);
-        }
     };
 
     const steps = [

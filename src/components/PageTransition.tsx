@@ -17,14 +17,13 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
     }, [pathname]);
 
     return (
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode="wait">
             <motion.div
                 key={pathname}
                 variants={pageVariants}
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                style={{ minHeight: '100vh' }}
             >
                 {children}
             </motion.div>

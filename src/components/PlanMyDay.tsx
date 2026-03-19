@@ -10,6 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchAlerts, NewsItem } from "@/lib/newsService";
 import { AlertCircle, AlertTriangle, PartyPopper } from "lucide-react";
 import { GlassmorphicSkeleton } from "@/components/ui/GlassmorphicSkeleton";
+import { logger } from "@/utils/logger";
+import { useToast } from "@/hooks/use-toast";
+
 
 interface PlanMyDayProps {
     isOpen: boolean;
@@ -62,8 +65,10 @@ function parseItinerary(text: string): ItineraryStop[] {
 }
 
 const PlanMyDay = ({ isOpen, onClose }: PlanMyDayProps) => {
+    const { toast } = useToast();
     const [step, setStep] = useState<'locating' | 'weather' | 'generating' | 'done' | 'error'>('locating');
     const [weather, setWeather] = useState<WeatherData | null>(null);
+
     const [stops, setStops] = useState<ItineraryStop[]>([]);
     const [rawAiText, setRawAiText] = useState('');
     const [mapsUrl, setMapsUrl] = useState('');
@@ -91,11 +96,17 @@ const PlanMyDay = ({ isOpen, onClose }: PlanMyDayProps) => {
         setRawAiText('');
         setErrorMsg('');
 
+        toast({
+            title: "Location Access",
+            description: "We use your location to generate a personalized daily itinerary for your current area.",
+        });
+
         navigator.geolocation.getCurrentPosition(
             async (pos) => {
                 const { latitude, longitude } = pos.coords;
                 setCoords({ lat: latitude, lng: longitude });
                 setStep('weather');
+
 
                 try {
                     // 1. Fetch weather
@@ -153,8 +164,9 @@ Only output the 4 numbered stops, nothing else. Keep tips short and practical.`;
                         const activeAlerts = await fetchAlerts();
                         setAlerts(activeAlerts);
                     } catch (err) {
-                        console.warn('Failed to fetch alerts:', err);
+                        logger.warn('Failed to fetch alerts:', err);
                     }
+
 
                     // 5. Build prompt with alerts if they exist
                     let finalPrompt = prompt;
@@ -187,10 +199,11 @@ Only output the 4 numbered stops, nothing else. Keep tips short and practical.`;
 
                     setStep('done');
                 } catch (err) {
-                    console.error('PlanMyDay error:', err);
+                    logger.error('PlanMyDay error:', err);
                     setErrorMsg('Could not generate your itinerary. Please check your connection and try again.');
                     setStep('error');
                 }
+
             },
             () => {
                 setErrorMsg('Location access denied. Please enable location and try again.');

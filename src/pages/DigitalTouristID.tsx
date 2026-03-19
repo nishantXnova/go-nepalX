@@ -12,6 +12,8 @@ import { cacheTrip, getCachedTrip, isOffline, CachedTripData } from "@/lib/offli
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/utils/logger";
+import { getSafeErrorMessage } from "@/utils/errorUtils";
 import { Link } from "react-router-dom";
 
 // ── Tourist Data Schema ──────────────────────────────────────────────────────
@@ -68,7 +70,7 @@ async function generateQRDataUrl(data: TouristData): Promise<string> {
             }
         });
     } catch (error) {
-        console.error('QR generation error:', error);
+        logger.error('QR generation error:', error);
         return '';
     }
 }
@@ -86,242 +88,8 @@ function getQRUrl(data: TouristData) {
 }
 
 // ── Hotel Check-In Simulator ──────────────────────────────────────────────────
-const VERIFY_STEPS = [
-    { label: "Connecting to FNMIS Secure Node…", icon: <Wifi className="w-4 h-4" />, duration: 1200 },
-    { label: "Verifying e-Visa Authenticity…", icon: <Shield className="w-4 h-4" />, duration: 1300 },
-    { label: "Biometric Record Cross-Check…", icon: <Fingerprint className="w-4 h-4" />, duration: 1100 },
-    { label: "Check complete: Identity Verified ✅", icon: <CheckCircle2 className="w-4 h-4 text-green-500" />, duration: 0 },
-];
 
-function HotelCheckin({ onClose, touristData }: { onClose: () => void; touristData: TouristData }) {
-    const [phase, setPhase] = useState<"scan" | "verifying" | "done">("scan");
-    const [stepIndex, setStepIndex] = useState(0);
-    const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-    const { toast } = useToast();
 
-    const runVerification = async () => {
-        setPhase("verifying");
-        setStepIndex(0);
-        setCompletedSteps([]);
-
-        for (let i = 0; i < VERIFY_STEPS.length - 1; i++) {
-            setStepIndex(i);
-            await new Promise(r => setTimeout(r, VERIFY_STEPS[i].duration));
-            setCompletedSteps(prev => [...prev, i]);
-        }
-
-        setStepIndex(VERIFY_STEPS.length - 1);
-        setCompletedSteps([0, 1, 2, 3]);
-        setPhase("done");
-    };
-
-    const handleOverstayAlert = () => {
-        toast({
-            title: "⚠️ No Overstay Detected",
-            description: "Visa expiry: 2026-03-01. Tourist is within permitted stay duration.",
-        });
-    };
-
-    const handleEmergencyContact = () => {
-        toast({
-            title: "📞 Emergency Contact",
-            description: `Contacting ${touristData.emergencyContact} via FNMIS emergency protocol…`,
-        });
-    };
-
-    return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[80] bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
-            onClick={onClose}
-        >
-            <motion.div
-                initial={{ y: 80, opacity: 0, scale: 0.97 }}
-                animate={{ y: 0, opacity: 1, scale: 1 }}
-                exit={{ y: 80, opacity: 0, scale: 0.97 }}
-                transition={{ type: "spring", damping: 25, stiffness: 280 }}
-                onClick={e => e.stopPropagation()}
-                className="w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl"
-            >
-                {/* Header */}
-                <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white p-5">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-[#E41B17] flex items-center justify-center">
-                                <Scan className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-lg">Hotel Check-In</h3>
-                                <p className="text-white/60 text-xs">FNMIS Verification System</p>
-                            </div>
-                        </div>
-                        <button
-                            onClick={onClose}
-                            className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
-                        >
-                            <span className="text-white text-sm">✕</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div className="p-5">
-                    {/* Scan Phase */}
-                    {phase === "scan" && (
-                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center space-y-8">
-                            {/* Fake QR Scanner UI */}
-                            <div className="relative mx-auto w-60 h-60 bg-gray-900 rounded-[2.5rem] overflow-hidden flex items-center justify-center border-[6px] border-[#E41B17]/10 shadow-inner">
-                                <div className="absolute inset-0 bg-gradient-to-br from-[#E41B17]/5 to-transparent" />
-                                <img src={localQRCode || getQRUrl(touristData)} alt="Tourist QR" className="w-48 h-48 opacity-40 brightness-150" />
-
-                                {/* Animated scanning beam */}
-                                <motion.div
-                                    className="absolute left-4 right-4 h-1 bg-[#E41B17] z-10"
-                                    style={{ boxShadow: "0 0 15px #E41B17, 0 0 30px #E41B17" }}
-                                    animate={{ top: ["15%", "85%", "15%"] }}
-                                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                                />
-
-                                {/* UI Overlays */}
-                                <div className="absolute top-4 left-4 w-6 h-6 border-t-4 border-l-4 border-[#E41B17] rounded-tl-lg" />
-                                <div className="absolute top-4 right-4 w-6 h-6 border-t-4 border-r-4 border-[#E41B17] rounded-tr-lg" />
-                                <div className="absolute bottom-4 left-4 w-6 h-6 border-b-4 border-l-4 border-[#E41B17] rounded-bl-lg" />
-                                <div className="absolute bottom-4 right-4 w-6 h-6 border-b-4 border-r-4 border-[#E41B17] rounded-br-lg" />
-                            </div>
-
-                            <div className="space-y-2">
-                                <p className="text-gray-900 font-bold text-lg">Waiting for Scan</p>
-                                <p className="text-gray-400 text-sm max-w-[240px] mx-auto">Please show your Digital Tourist ID to the device camera.</p>
-                            </div>
-
-                            <Button
-                                onClick={runVerification}
-                                className="w-full h-16 bg-[#E41B17] hover:bg-[#c0151a] hover:scale-[1.02] active:scale-[0.98] transition-all text-white rounded-[1.25rem] text-lg font-bold shadow-xl shadow-red-500/20"
-                            >
-                                <Scan className="w-6 h-6 mr-3" />
-                                Start Secure Scan
-                            </Button>
-                        </motion.div>
-                    )}
-
-                    {/* Verifying Phase */}
-                    {(phase === "verifying" || phase === "done") && (
-                        <div className="space-y-4">
-                            <div className="space-y-3">
-                                {VERIFY_STEPS.map((step, i) => {
-                                    const isActive = stepIndex === i && phase === "verifying";
-                                    const isDone = completedSteps.includes(i);
-                                    const isPending = i > stepIndex && phase !== "done";
-
-                                    return (
-                                        <motion.div
-                                            key={i}
-                                            initial={{ opacity: 0, x: -10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: i * 0.05 }}
-                                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${isDone
-                                                ? i === VERIFY_STEPS.length - 1
-                                                    ? "bg-green-50 border border-green-200"
-                                                    : "bg-gray-50 border border-gray-100"
-                                                : isActive
-                                                    ? "bg-blue-50 border border-blue-200"
-                                                    : "bg-gray-50/50 border border-gray-100 opacity-40"
-                                                }`}
-                                        >
-                                            <div className={`flex-shrink-0 ${isDone && i < VERIFY_STEPS.length - 1 ? "text-green-500" : isActive ? "text-blue-500" : "text-gray-400"}`}>
-                                                {isActive ? (
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                                ) : isDone ? (
-                                                    i === VERIFY_STEPS.length - 1 ? (
-                                                        <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                                    ) : (
-                                                        <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                                    )
-                                                ) : (
-                                                    step.icon
-                                                )}
-                                            </div>
-                                            <span className={`text-sm font-medium ${isDone && i === VERIFY_STEPS.length - 1 ? "text-green-700" : isActive ? "text-blue-700" : "text-gray-500"}`}>
-                                                {step.label}
-                                            </span>
-                                        </motion.div>
-                                    );
-                                })}
-                            </div>
-
-                            {/* Verified Result */}
-                            <AnimatePresence>
-                                {phase === "done" && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 15 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.3 }}
-                                        className="space-y-4"
-                                    >
-                                        {/* Tourist Info Card */}
-                                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-4">
-                                            <div className="flex items-center gap-2 mb-3">
-                                                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                                                <span className="font-bold text-green-700 text-sm">Identity Verified</span>
-                                                <span className="ml-auto text-xs bg-green-100 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-semibold">
-                                                    FNMIS ✓
-                                                </span>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-2 text-xs">
-                                                {[
-                                                    { label: "Name", value: touristData.name },
-                                                    { label: "Tourist ID", value: touristData.touristId },
-                                                    { label: "Visa Type", value: touristData.visaType },
-                                                    { label: "Status", value: "✅ " + touristData.status },
-                                                    { label: "Nationality", value: touristData.nationalityFlag + " " + touristData.nationality },
-                                                    { label: "Exit Date", value: touristData.exitDate },
-                                                ].map(f => (
-                                                    <div key={f.label} className="bg-white/70 rounded-lg px-2.5 py-2">
-                                                        <p className="text-gray-400 text-[10px] uppercase tracking-wider mb-0.5">{f.label}</p>
-                                                        <p className="text-gray-800 font-semibold">{f.value}</p>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        {/* Action Buttons */}
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={handleOverstayAlert}
-                                                className="rounded-xl border-amber-200 text-amber-700 hover:bg-amber-50 text-xs py-2.5"
-                                            >
-                                                <AlertTriangle className="w-3.5 h-3.5 mr-1.5" />
-                                                Overstay Check
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={handleEmergencyContact}
-                                                className="rounded-xl border-red-200 text-red-700 hover:bg-red-50 text-xs py-2.5"
-                                            >
-                                                <Phone className="w-3.5 h-3.5 mr-1.5" />
-                                                Emergency
-                                            </Button>
-                                        </div>
-                                        <Button
-                                            onClick={() => { setPhase("scan"); setStepIndex(0); setCompletedSteps([]); }}
-                                            className="w-full bg-gray-900 hover:bg-gray-700 text-white rounded-xl text-sm"
-                                        >
-                                            Scan Another Guest
-                                        </Button>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
-                    )}
-                </div>
-            </motion.div>
-        </motion.div>
-    );
-}
 
 // ── Edit Profile Form ────────────────────────────────────────────────────────
 function EditProfileModal({ data, onSave, onClose }: { data: TouristData; onSave: (d: TouristData) => void; onClose: () => void }) {
@@ -446,7 +214,7 @@ const DigitalTouristID = () => {
                 setLocalQRCode(qrDataUrl);
                 setQrLoaded(true);
             } catch (error) {
-                console.error('Failed to generate QR:', error);
+                logger.error('Failed to generate QR:', error);
             }
         };
         generateQR();
@@ -463,7 +231,7 @@ const DigitalTouristID = () => {
             try {
                 setTouristData(JSON.parse(saved));
             } catch (e) {
-                console.error("Failed to parse saved tourist data", e);
+                logger.error("Failed to parse saved tourist data", e);
             }
         }
     }, []);
@@ -504,11 +272,11 @@ const DigitalTouristID = () => {
                 description: "Your Tourist ID has been saved to your device.",
             });
         } catch (error) {
-            console.error('Download error:', error);
+            logger.error('Download error:', error);
             toast({
                 variant: "destructive",
                 title: "Download Failed",
-                description: "Could not download the ID card. Please try again.",
+                description: getSafeErrorMessage("Could not download the ID card. Please try again."),
             });
         }
     };
@@ -555,7 +323,7 @@ const DigitalTouristID = () => {
                 toast({ title: "📋 Image Downloaded!", description: "Share the downloaded image to share your ID." });
             }
         } catch (error) {
-            console.error('Share error:', error);
+            logger.error('Share error:', error);
             // Fallback to text sharing
             if (navigator.share) {
                 try {
@@ -582,11 +350,24 @@ const DigitalTouristID = () => {
     const handleCacheTrip = async () => {
         setIsCaching(true);
         try {
+            // Fix 8: Permission check before Geolocation
+            const hasConsent = localStorage.getItem("geo_consent") === "true";
+            if (!hasConsent) {
+                const proceed = window.confirm("GoNepal needs your location to cache weather and nearby emergency services for offline use. Do you allow this?");
+                if (!proceed) {
+                    setIsCaching(false);
+                    return;
+                }
+                localStorage.setItem("geo_consent", "true");
+            }
+
             // Get location
             const pos: GeolocationPosition = await new Promise((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(resolve, reject);
             });
-            const { latitude, longitude } = pos.coords;
+            // Fix 1: Round coordinates to 3 decimal places
+            const latitude = Math.round(pos.coords.latitude * 1000) / 1000;
+            const longitude = Math.round(pos.coords.longitude * 1000) / 1000;
 
             // Fetch weather
             const wRes = await fetch(
@@ -629,11 +410,11 @@ const DigitalTouristID = () => {
                 description: "Weather and coordinates saved for offline access.",
             });
         } catch (error) {
-            console.error("Caching error:", error);
+            logger.error("Caching error:", error);
             toast({
                 variant: "destructive",
                 title: "Failed to cache trip",
-                description: "Please check your connection and location permissions.",
+                description: getSafeErrorMessage("Please check your connection and location permissions."),
             });
         } finally {
             setIsCaching(false);
@@ -641,8 +422,23 @@ const DigitalTouristID = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F2F2F2]">
+        <div className="min-h-screen bg-gradient-to-br from-[#F2F2F2] to-[#E5E9F0] relative overflow-hidden">
+            {/* Subtle background abstract shapes */}
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-100/40 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-red-100/40 rounded-full blur-3xl pointer-events-none" />
             <Navbar />
+
+            {/* Beta Disclaimer Banner - Fixed at top, visible on all devices */}
+            <div className="fixed top-16 left-0 right-0 z-40 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 shadow-lg">
+                <div className="max-w-sm mx-auto px-4 py-2 flex items-center justify-center gap-2">
+                    <div className="bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-full flex-shrink-0">
+                        <span className="text-white text-[10px] font-bold uppercase tracking-wider">Beta</span>
+                    </div>
+                    <p className="text-white text-xs font-medium text-center">
+                        ⚠️ GoNepal is in testing — <span className="underline decoration-white/50">don't enter real documents</span>!
+                    </p>
+                </div>
+            </div>
 
             {/* Hotel Check-in Modal */}
             <AnimatePresence>
@@ -654,7 +450,7 @@ const DigitalTouristID = () => {
                 {showEdit && <EditProfileModal data={touristData} onSave={handleSave} onClose={() => setShowEdit(false)} />}
             </AnimatePresence>
 
-            <div className="pt-20 pb-12 px-4">
+            <div className="pt-28 pb-12 px-4">
                 <div className="max-w-sm mx-auto space-y-4">
 
                     {/* Back + Header */}
@@ -858,21 +654,7 @@ const DigitalTouristID = () => {
                         </Button>
                     </motion.div>
 
-                    {/* ── Hotel Check-In CTA ─────────────────────────────────────────── */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                    >
-                        <button
-                            onClick={() => setShowCheckin(true)}
-                            className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-gray-800 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.99]"
-                        >
-                            <Scan className="w-5 h-5" />
-                            Simulate Hotel Check-In
-                            <div className="ml-auto text-xs bg-white/10 px-2 py-0.5 rounded-full">FNMIS</div>
-                        </button>
-                    </motion.div>
+
 
                     {/* ── Trekker's Offline Toolkit ── */}
                     <motion.div
@@ -965,7 +747,7 @@ const DigitalTouristID = () => {
                     </motion.div>
 
                     {/* Disclaimer */}
-                    <p className="text-center text-[10px] text-gray-400 leading-relaxed px-4">
+                    <p className="text-center text-xs text-gray-400 leading-relaxed px-4">
                         🔒 This is a simulated Digital Tourist ID for demonstration purposes only.<br />
                         Not a legal document. FNMIS integration is mocked.
                     </p>

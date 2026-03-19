@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/logger';
+import { getSafeErrorMessage } from '@/utils/errorUtils';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -47,7 +49,7 @@ const AdminDashboard = () => {
       if (error) throw error;
       setPlaces(data || []);
     } catch (error) {
-      console.error('Error fetching places:', error);
+      logger.error('Error fetching places:', error);
     } finally {
       setLoading(false);
     }
@@ -111,7 +113,7 @@ const AdminDashboard = () => {
       resetForm();
       fetchPlaces();
     } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Error', description: error.message });
+      toast({ variant: 'destructive', title: 'Error', description: getSafeErrorMessage(error) });
     } finally {
       setSaving(false);
     }
@@ -126,7 +128,7 @@ const AdminDashboard = () => {
       toast({ title: 'Place deleted successfully' });
       fetchPlaces();
     } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Error', description: error.message });
+      toast({ variant: 'destructive', title: 'Error', description: getSafeErrorMessage(error) });
     }
   };
 
