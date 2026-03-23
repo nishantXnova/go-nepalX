@@ -119,14 +119,14 @@ const Auth = () => {
         {/* Hero Content */}
         <div className="absolute bottom-20 left-12 right-12">
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
-            <div className="inline-flex items-center gap-2 bg-yellow-400/90 px-3 py-1 rounded-full mb-6">
-              <div className="w-1.5 h-1.5 bg-yellow-900 rounded-full" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-900">Start Your Journey</span>
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-xl border border-white/20 px-4 py-2 rounded-full mb-8 shadow-2xl">
+              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white">Start Your Journey</span>
             </div>
-            <h1 className="text-7xl font-bold text-white leading-[1.1] mb-6 font-serif">
+            <h1 className="text-7xl font-bold text-white leading-[1.1] mb-6 font-serif tracking-tight">
               Discover the Magic of Nepal
             </h1>
-            <p className="text-lg text-white/80 max-w-lg leading-relaxed font-sans">
+            <p className="text-lg text-white/90 max-w-lg leading-relaxed font-sans font-light">
               From the majestic Himalayas to ancient temples, explore breathtaking destinations and create unforgettable memories.
             </p>
           </motion.div>
@@ -232,8 +232,8 @@ const Auth = () => {
                     )} />
                   )}
 
-                  <div className="pt-4">
-                    <Button type="submit" disabled={isLoading} className="w-full h-[56px] rounded-xl bg-[#f04423] hover:bg-[#d93a1d] text-white text-[17px] font-bold shadow-lg shadow-red-500/20 transition-all active:scale-[0.98]">
+                  <div className="pt-6">
+                    <Button type="submit" disabled={isLoading} className="w-full h-[60px] rounded-2xl bg-gradient-to-r from-[#f04423] to-[#ff6b2b] text-white text-[17px] font-bold shadow-xl shadow-red-500/30 transition-all active:scale-[0.98] border-t border-white/20">
                       {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isLogin ? 'Sign In' : 'Create Account')}
                     </Button>
                   </div>
@@ -242,9 +242,12 @@ const Auth = () => {
             </motion.div>
           </AnimatePresence>
 
-          <div className="mt-8 text-center text-[11px] text-slate-400 max-w-[250px] mx-auto leading-relaxed">
-            By continuing, you agree to our <Link to="/terms" className="text-slate-900 underline font-bold">Terms of Service</Link> and <Link to="/privacy" className="text-slate-900 underline font-bold">Privacy Policy</Link>.
-          </div>
+          <footer className="mt-12 text-center">
+            <p className="text-[12px] text-slate-400 max-w-[280px] mx-auto leading-relaxed">
+              By continuing, you agree to our <br />
+              <Link to="/terms" className="text-slate-900 font-bold hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-slate-900 font-bold hover:underline">Privacy Policy</Link>
+            </p>
+          </footer>
         </motion.div>
       </div>
     </div>
