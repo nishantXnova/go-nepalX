@@ -86,7 +86,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (session.user.email === 'paudelnishant15@gmail.com') {
             setIsAdmin(true);
           }
-          fetchProfile(session.user.id);
+          fetchProfile(session.user.id).finally(() => {
+            if (isMounted) setLoading(false);
+          });
         } else {
           setLoading(false);
         }
