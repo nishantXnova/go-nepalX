@@ -40,7 +40,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         // Also check admin status via role or rpc
         const { data: adminData } = await supabase.rpc('is_admin', { _user_id: userId });
-        setIsAdmin(!!adminData || profileData.role === 'admin' || user?.email === import.meta.env.VITE_ADMIN_EMAIL);
+        const isLocalAdmin = user?.email === 'paudelnishant15@gmail.com';
+        setIsAdmin(!!adminData || profileData.role === 'admin' || isLocalAdmin);
       }
     } catch (err) {
       logger.error('Error fetching profile:', err);

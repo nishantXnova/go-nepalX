@@ -48,17 +48,27 @@ const Auth = () => {
   
   // Auto-redirect if already logged in
   useEffect(() => {
-    if (user && profile) {
-      const role = profile.role?.toLowerCase();
-      if (role === 'admin' || user.email === import.meta.env.VITE_ADMIN_EMAIL) {
+    if (user) {
+      // Priority 1: Hardcoded Master Admin Check (Immediate)
+      if (user.email === 'paudelnishant15@gmail.com') {
+        toast({ title: "Admin Recognized", description: "Redirecting to Security Vault..." });
         navigate('/admin');
-      } else if (role === 'guide') {
-        const kycStatus = profile.guide_applications?.[0]?.status;
-        if (!kycStatus) navigate('/guide/kyc');
-        else if (kycStatus === 'pending') navigate('/guide/pending');
-        else navigate('/guide/dashboard');
-      } else {
-        navigate('/');
+        return;
+      }
+
+      // Priority 2: Profile-based Role Check
+      if (profile) {
+        const role = profile.role?.toLowerCase();
+        if (role === 'admin') {
+          navigate('/admin');
+        } else if (role === 'guide') {
+          const kycStatus = profile.guide_applications?.[0]?.status;
+          if (!kycStatus) navigate('/guide/kyc');
+          else if (kycStatus === 'pending') navigate('/guide/pending');
+          else navigate('/guide/dashboard');
+        } else {
+          navigate('/');
+        }
       }
     }
   }, [user, profile, navigate]);

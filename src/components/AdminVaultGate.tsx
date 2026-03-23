@@ -8,8 +8,7 @@ import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-  InputOTPSeparator 
-} from '@/components/ui/form'; // Wait, input-otp is usually in ui/input-otp
+} from '@/components/ui/input-otp';
 import { useToast } from '@/hooks/use-toast';
 import QRCode from 'qrcode';
 
@@ -17,7 +16,7 @@ import QRCode from 'qrcode';
 // but since 'qrcode' is here, we can assume a professional setup.
 
 const AdminVaultGate = ({ children }: { children: React.ReactNode }) => {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const { toast } = useToast();
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [mode, setMode] = useState<'pin' | 'totp'>('pin');
@@ -25,6 +24,13 @@ const AdminVaultGate = ({ children }: { children: React.ReactNode }) => {
   const [totp, setTotp] = useState('');
   const [qrUrl, setQrUrl] = useState('');
   const [showQr, setShowQr] = useState(false);
+  
+  // Debug log to see if AdminGate is active
+  useEffect(() => {
+    if (user?.email === 'paudelnishant15@gmail.com') {
+      console.log("AdminVaultGate active for master admin");
+    }
+  }, [user]);
 
   // The secret PIN from .env (VITE_ADMIN_PIN)
   const MASTER_PIN = import.meta.env.VITE_ADMIN_PIN || '7394';
