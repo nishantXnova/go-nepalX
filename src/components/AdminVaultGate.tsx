@@ -18,7 +18,9 @@ import QRCode from 'qrcode';
 const AdminVaultGate = ({ children }: { children: React.ReactNode }) => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(() => {
+    return sessionStorage.getItem('admin_vault_unlocked') === 'true';
+  });
   const [mode, setMode] = useState<'pin' | 'totp'>('pin');
   const [pin, setPin] = useState('');
   const [totp, setTotp] = useState('');
@@ -28,9 +30,9 @@ const AdminVaultGate = ({ children }: { children: React.ReactNode }) => {
   // Debug log to see if AdminGate is active
   useEffect(() => {
     if (user?.email === 'paudelnishant15@gmail.com') {
-      console.log("AdminVaultGate active for master admin");
+      console.log("AdminVaultGate active for master admin, unlocked:", isUnlocked);
     }
-  }, [user]);
+  }, [user, isUnlocked]);
 
   // The secret PIN from .env (VITE_ADMIN_PIN)
   const MASTER_PIN = import.meta.env.VITE_ADMIN_PIN || '7394';
@@ -47,6 +49,7 @@ const AdminVaultGate = ({ children }: { children: React.ReactNode }) => {
   const handlePinSubmit = () => {
     if (pin === MASTER_PIN) {
       setIsUnlocked(true);
+      sessionStorage.setItem('admin_vault_unlocked', 'true');
       toast({ title: "Vault Unlocked", description: "Admin session authorized." });
     } else {
       toast({ variant: "destructive", title: "Invalid PIN", description: "Access denied." });
@@ -55,10 +58,9 @@ const AdminVaultGate = ({ children }: { children: React.ReactNode }) => {
   };
 
   const handleTotpSubmit = () => {
-    // For now, let's simulate TOTP success if they enter '000000' or similar 
-    // until we have the full backend secret sync.
     if (totp === '000000') {
       setIsUnlocked(true);
+      sessionStorage.setItem('admin_vault_unlocked', 'true');
       toast({ title: "MFA Verified", description: "Biometric/TOTP handshake successful." });
     } else {
       toast({ variant: "destructive", title: "Invalid Code", description: "Authenticator sync failed." });
@@ -145,7 +147,10 @@ const AdminVaultGate = ({ children }: { children: React.ReactNode }) => {
               <span className="text-[10px] font-bold uppercase text-slate-500">{mode === 'pin' ? 'Use Authenticator' : 'Use PIN'}</span>
             </button>
             <button 
-              onClick={signOut}
+              onClick={() => {
+                sessionStorage.removeItem('admin_vault_unlocked');
+                signOut();
+              }}
               className="flex flex-col items-center gap-2 p-4 bg-slate-50 rounded-2xl border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all"
             >
               <LogOut className="w-5 h-5 text-red-400" />

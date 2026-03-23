@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Loader2, MapPin, Star, Users, Image, Save, X, RefreshCw, Clock } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, MapPin, Star, Users, Image, Save, X, RefreshCw, Clock, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -290,6 +290,26 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </Link>
+
+            <div className="bg-card rounded-xl p-6 border border-border">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-blue-500" />
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-foreground">MFA Active</p>
+                  <button 
+                    onClick={() => {
+                      sessionStorage.removeItem('admin_vault_unlocked');
+                      window.location.reload();
+                    }}
+                    className="text-xs text-blue-500 font-bold hover:underline"
+                  >
+                    Setup/Reset Authenticator
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
 
