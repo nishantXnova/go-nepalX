@@ -69,9 +69,10 @@ const AdminVaultGate = ({ children }: { children: React.ReactNode }) => {
 
   const generateSetupQR = async () => {
     try {
-      // In a real app, this secret comes from the database
-      const secret = "GO_NEPAL_ADMIN_SECRET_2024"; 
-      const otpauth = `otpauth://totp/GoNepal:Admin?secret=${secret}&issuer=GoNepal`;
+      // Use a valid Base32 secret for proper authenticator compatibility
+      const secret = "GONEPALADMIN234567"; 
+      const label = `GoNepal Admin (${user?.email || 'paudelnishant15@gmail.com'})`;
+      const otpauth = `otpauth://totp/${encodeURIComponent(label)}?secret=${secret}&issuer=GoNepal`;
       const url = await QRCode.toDataURL(otpauth);
       setQrUrl(url);
       setShowQr(true);
@@ -181,7 +182,9 @@ const AdminVaultGate = ({ children }: { children: React.ReactNode }) => {
                   <img src={qrUrl} alt="2FA QR" className="w-48 h-48" />
                 </div>
                 <div className="space-y-4">
-                  <div className="bg-slate-50 p-4 rounded-2xl text-xs font-mono text-slate-400">GO_NE_PA_LA_DM_IN_SE_CR_ET</div>
+                  <div className="bg-slate-50 p-4 rounded-2xl text-xs font-mono text-slate-400 break-all select-all">
+                    GONEPALADMIN234567
+                  </div>
                   <Button onClick={() => setShowQr(false)} className="w-full h-14 bg-slate-900 rounded-2xl text-white font-bold">Done</Button>
                 </div>
               </div>

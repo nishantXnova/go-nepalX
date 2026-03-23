@@ -54,16 +54,15 @@ const Auth = () => {
       // If we are already on the /admin path, don't redirect away
       if (location.pathname.startsWith('/admin')) return;
 
-      if (isAdminEmail) {
-        navigate('/admin');
-        return;
-      }
+      // Note: Admin redirection was removed per user request. 
+      // Admins will land on Home/Profile and click the Shield icon manually.
 
       if (profile) {
         const role = profile.role?.toLowerCase();
-        if (role === 'admin') {
-          navigate('/admin');
-        } else if (role === 'guide') {
+        // Skip auto-redirect for Admin to fulfill "only in the admin dashboard" request
+        if (role === 'admin' || isAdminEmail) return; 
+
+        if (role === 'guide') {
           const kycStatus = profile.guide_applications?.[0]?.status;
           if (!kycStatus) navigate('/guide/kyc');
           else if (kycStatus === 'pending') navigate('/guide/pending');
