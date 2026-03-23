@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Mail, Lock, User, Loader2, ArrowLeft, ChevronRight, Check } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Loader2, ChevronRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { getSafeErrorMessage } from '@/utils/errorUtils';
+import gonepallogo from '@/assets/gonepallogo.png';
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: 'Valid email is required' }),
@@ -84,21 +85,9 @@ const Auth = () => {
   const onSignupSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
     try {
-      console.log('Attempting signup for:', data.email, 'Role:', authRole);
       const { error } = await signUp(data.email, data.password, data.fullName, authRole);
-      if (error) {
-        console.error('Signup Error:', error);
-        toast({ 
-          variant: 'destructive', 
-          title: 'Account Creation Failed', 
-          description: error.message || "An unexpected error occurred. Please try again later."
-        });
-      } else {
-        navigate(`/auth/success?email=${encodeURIComponent(data.email)}&role=${authRole}`);
-      }
-    } catch (e: any) {
-      console.error('Catch Error during signup:', e);
-      toast({ variant: 'destructive', title: 'Critical Error', description: e.message });
+      if (error) toast({ variant: 'destructive', title: 'Account Creation Failed', description: error.message });
+      else navigate(`/auth/success?email=${encodeURIComponent(data.email)}&role=${authRole}`);
     } finally { setIsLoading(false); }
   };
 
@@ -108,80 +97,128 @@ const Auth = () => {
   const hasNumber = /[0-9]/.test(watchPassword);
 
   return (
-    <div className="min-h-screen flex bg-[#f5f5f7] antialiased">
-      {/* Visual Section - The Sweet Spot */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-black border-r border-[#d2d2d7]/30">
+    <div className="min-h-screen flex bg-white antialiased">
+      {/* LEFT SECTION - VIBRANT MOCKUP STYLE */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-black">
         <motion.img 
-          initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ scale: 1.05 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 2, ease: "easeOut" }}
           src="/loginimg.png" 
-          alt="Nepal" 
-          className="w-full h-full object-cover opacity-80" 
+          alt="Nepal Mountains" 
+          className="w-full h-full object-cover opacity-90 brightness-75" 
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
-        <div className="absolute inset-0 p-16 flex flex-col justify-center items-start">
-          <motion.div initial={{ x: -25, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.5, duration: 0.8 }}>
-            <h1 className="text-6xl xl:text-8xl font-black text-white tracking-tighter leading-none mb-6">GoNepal.</h1>
-            <div className="h-[2px] w-20 bg-white mb-6" />
-            <p className="text-2xl xl:text-3xl text-white font-medium max-w-sm leading-snug tracking-tight opacity-90">
-              The mountains don't wait.<br/>Neither should your guide.
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        
+        {/* Logo */}
+        <div className="absolute top-12 left-12 flex items-center gap-3">
+          <img src={gonepallogo} alt="GoNepal Logo" className="h-10 w-auto" />
+          <span className="text-2xl font-bold text-white tracking-tight">GoNepal</span>
+        </div>
+
+        {/* Hero Content */}
+        <div className="absolute bottom-20 left-12 right-12">
+          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
+            <div className="inline-flex items-center gap-2 bg-yellow-400/90 px-3 py-1 rounded-full mb-6">
+              <div className="w-1.5 h-1.5 bg-yellow-900 rounded-full" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-yellow-900">Start Your Journey</span>
+            </div>
+            <h1 className="text-7xl font-bold text-white leading-[1.1] mb-6 font-serif">
+              Discover the Magic of Nepal
+            </h1>
+            <p className="text-lg text-white/80 max-w-lg leading-relaxed font-sans">
+              From the majestic Himalayas to ancient temples, explore breathtaking destinations and create unforgettable memories.
             </p>
           </motion.div>
         </div>
       </div>
 
-      {/* Form Section - Clean & Responsive */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center px-6 py-12 md:px-12 bg-[#f5f5f7]">
-        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="w-full max-w-sm mx-auto">
+      {/* RIGHT SECTION - GLASSMORPHISM & VIBRANT ACTIONS */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center px-8 sm:px-16 py-12 bg-white">
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="w-full max-w-sm">
           
-          <header className="mb-8 text-center sm:text-left">
-            <h2 className="text-3xl font-semibold text-[#1d1d1f] tracking-tight">{isLogin ? 'Sign In' : 'Create Account'}</h2>
-            <p className="text-[#86868b] mt-2 text-sm leading-relaxed">
-              Use your GoNepal ID to manage journeys as a {authRole}.
+          <header className="mb-10 text-center">
+            <h2 className="text-4xl font-bold text-slate-900 font-serif mb-2">{isLogin ? 'Welcome Back' : 'Join GoNepal'}</h2>
+            <p className="text-slate-500 font-medium text-sm">
+              {isLogin ? 'Sign in to continue your adventure' : 'Create an account to start exploring'}
             </p>
           </header>
 
-          <div className="bg-[#e8e8ed] p-1 rounded-xl flex mb-10 w-full shadow-inner shadow-slate-200">
-            <button onClick={() => setAuthRole('traveller')} className={`flex-1 py-1.5 rounded-[9px] text-[13px] font-semibold transition-all ${authRole === 'traveller' ? 'bg-white shadow-sm text-[#1d1d1f]' : 'text-[#86868b] hover:text-[#1d1d1f]'}`}>Traveller</button>
-            <button onClick={() => setAuthRole('guide')} className={`flex-1 py-1.5 rounded-[9px] text-[13px] font-semibold transition-all ${authRole === 'guide' ? 'bg-white shadow-sm text-[#1d1d1f]' : 'text-[#86868b] hover:text-[#1d1d1f]'}`}>Guide</button>
+          {/* Glassmorphism Toggle */}
+          <div className="bg-slate-100/80 backdrop-blur-md p-1.5 rounded-2xl flex mb-10 w-full border border-slate-200/50">
+            <button 
+              onClick={() => setIsLogin(true)} 
+              className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all ${isLogin ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              Sign In
+            </button>
+            <button 
+              onClick={() => setIsLogin(false)} 
+              className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all ${!isLogin ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              Sign Up
+            </button>
           </div>
 
+          {/* Role Selection (Apple style refined) */}
+          {/* {!isLogin && (
+            <div className="flex bg-slate-50 p-1 rounded-xl mb-6 border border-slate-100">
+               <button onClick={() => setAuthRole('traveller')} className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${authRole === 'traveller' ? 'bg-white shadow-sm text-primary' : 'text-slate-400'}`}>Traveller</button>
+               <button onClick={() => setAuthRole('guide')} className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${authRole === 'guide' ? 'bg-white shadow-sm text-primary' : 'text-slate-400'}`}>Guide Onboarding</button>
+            </div>
+          )} */}
+
           <AnimatePresence mode="wait">
-            <motion.div key={isLogin ? 'login' : 'signup'} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.4 }}>
+            <motion.div key={isLogin ? 'login' : 'signup'} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
               <Form {...(isLogin ? loginForm : signupForm)}>
-                <form onSubmit={(isLogin ? loginForm : signupForm).handleSubmit(isLogin ? onLoginSubmit : onSignupSubmit)} className="space-y-4">
+                <form onSubmit={(isLogin ? loginForm : signupForm).handleSubmit(isLogin ? onLoginSubmit : onSignupSubmit)} className="space-y-5">
+                  
+                  {/* Role Selection inside the Form for clarity */}
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Identify As</span>
+                    <div className="flex gap-4">
+                      <button type="button" onClick={() => setAuthRole('traveller')} className={`text-xs font-bold transition-colors ${authRole === 'traveller' ? 'text-primary underline underline-offset-4' : 'text-slate-300'}`}>Traveller</button>
+                      <button type="button" onClick={() => setAuthRole('guide')} className={`text-xs font-bold transition-colors ${authRole === 'guide' ? 'text-primary underline underline-offset-4' : 'text-slate-300'}`}>Guide</button>
+                    </div>
+                  </div>
+
                   {!isLogin && (
                     <FormField control={signupForm.control} name="fullName" render={({ field }) => (
                       <FormItem>
-                        <FormControl><Input placeholder="Full Name" className="bg-white border-[#d2d2d7] rounded-xl py-6 px-4 text-[17px] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-colors shadow-none" {...field} /></FormControl>
-                        <FormMessage className="text-[12px] text-[#ff3b30]" />
+                        <FormLabel className="text-slate-600 font-bold text-xs uppercase ml-1">Full Name</FormLabel>
+                        <div className="relative">
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                          <FormControl><Input placeholder="John Doe" className="bg-slate-50 border-slate-200/60 rounded-xl py-6 pl-12 shadow-none focus:bg-white" {...field} /></FormControl>
+                        </div>
                       </FormItem>
                     )} />
                   )}
                   
                   <FormField control={(isLogin ? loginForm : signupForm).control} name="email" render={({ field }) => (
                     <FormItem>
-                      <FormControl><Input placeholder="Email" className="bg-white border-[#d2d2d7] rounded-xl py-6 px-4 text-[17px] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-colors shadow-none" {...field} /></FormControl>
-                      <FormMessage className="text-[12px] text-[#ff3b30]" />
+                      <FormLabel className="text-slate-600 font-bold text-xs uppercase ml-1">Email</FormLabel>
+                      <div className="relative">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <FormControl><Input placeholder="you@example.com" className="bg-slate-50 border-slate-200/60 rounded-xl py-6 pl-12 shadow-none focus:bg-white" {...field} /></FormControl>
+                      </div>
                     </FormItem>
                   )} />
 
                   <FormField control={(isLogin ? loginForm : signupForm).control} name="password" render={({ field }) => (
                     <FormItem>
+                      <FormLabel className="text-slate-600 font-bold text-xs uppercase ml-1">Password</FormLabel>
                       <div className="relative">
-                        <FormControl><Input type={showPassword ? "text" : "password"} placeholder="Password" className="bg-white border-[#d2d2d7] rounded-xl py-6 px-4 text-[17px] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-colors shadow-none" {...field} /></FormControl>
-                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#86868b]">{showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <FormControl><Input type={showPassword ? "text" : "password"} placeholder="••••••••" className="bg-slate-50 border-slate-200/60 rounded-xl py-6 pl-12 pr-12 shadow-none focus:bg-white" {...field} /></FormControl>
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
                       </div>
-                      <FormMessage className="text-[12px] text-[#ff3b30]" />
                       {!isLogin && (
-                        <div className="bg-white rounded-xl p-3.5 mt-2 border border-[#d2d2d7]/40 space-y-1.5 shadow-sm">
-                          <p className="text-[10px] font-bold text-[#86868b] uppercase tracking-widest mb-1.5 opacity-60">Validation Requirements</p>
-                          <div className="flex flex-col gap-2">
-                             <Requirement label="Min 8 characters" met={hasMinLength} />
-                             <Requirement label="One upper-case letter" met={hasUppercase} />
-                             <Requirement label="One number" met={hasNumber} />
-                          </div>
+                        <div className="grid grid-cols-3 gap-1 mt-2 px-1">
+                          <div className={`h-1 rounded-full ${hasMinLength ? 'bg-green-500' : 'bg-slate-200'}`} />
+                          <div className={`h-1 rounded-full ${hasUppercase ? 'bg-green-500' : 'bg-slate-200'}`} />
+                          <div className={`h-1 rounded-full ${hasNumber ? 'bg-green-500' : 'bg-slate-200'}`} />
                         </div>
                       )}
                     </FormItem>
@@ -190,17 +227,14 @@ const Auth = () => {
                   {!isLogin && (
                     <FormField control={signupForm.control} name="confirmPassword" render={({ field }) => (
                       <FormItem>
-                        <FormControl><Input type="password" placeholder="Confirm Password" className="bg-white border-[#d2d2d7] rounded-xl py-6 px-4 text-[17px] focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3] transition-colors shadow-none" {...field} /></FormControl>
-                        <FormMessage className="text-[12px] text-[#ff3b30]" />
+                        <FormControl><Input type="password" placeholder="Confirm Password" className="bg-slate-50 border-slate-200/60 rounded-xl py-6 px-4 shadow-none focus:bg-white" {...field} /></FormControl>
                       </FormItem>
                     )} />
                   )}
 
-                  <div className="pt-6">
-                    <Button type="submit" disabled={isLoading} className="w-full h-[52px] rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white text-[17px] font-semibold transition-all flex items-center justify-center gap-2 group shadow-lg shadow-[#0071e3]/20">
-                      {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
-                        <>{isLogin ? 'Sign In' : 'Create Account'}<ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" /></>
-                      )}
+                  <div className="pt-4">
+                    <Button type="submit" disabled={isLoading} className="w-full h-[56px] rounded-xl bg-[#f04423] hover:bg-[#d93a1d] text-white text-[17px] font-bold shadow-lg shadow-red-500/20 transition-all active:scale-[0.98]">
+                      {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isLogin ? 'Sign In' : 'Create Account')}
                     </Button>
                   </div>
                 </form>
@@ -208,30 +242,13 @@ const Auth = () => {
             </motion.div>
           </AnimatePresence>
 
-          <footer className="mt-10 text-center sm:text-left text-sm">
-            <p className="text-[#86868b]">
-              {isLogin ? "No account?" : "Have one?"}
-              <button onClick={() => setIsLogin(!isLogin)} className="ml-1 text-[#0066cc] hover:underline font-medium">{isLogin ? 'Create yours.' : 'Sign in.'}</button>
-            </p>
-          </footer>
-          
-          <p className="mt-16 text-[11px] text-[#86868b] text-center max-w-[300px] mx-auto leading-relaxed border-t border-slate-200 pt-6">
-            Continue to agree to GoNepal's <Link to="/terms" className="text-[#0066cc]">Terms</Link> and <Link to="/privacy" className="text-[#0066cc]">Privacy Policy</Link>.
-          </p>
+          <div className="mt-8 text-center text-[11px] text-slate-400 max-w-[250px] mx-auto leading-relaxed">
+            By continuing, you agree to our <Link to="/terms" className="text-slate-900 underline font-bold">Terms of Service</Link> and <Link to="/privacy" className="text-slate-900 underline font-bold">Privacy Policy</Link>.
+          </div>
         </motion.div>
       </div>
     </div>
   );
 };
-
-// Internal components
-const Requirement = ({ label, met }: { label: string, met: boolean }) => (
-  <div className="flex items-center gap-2.5">
-    <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-all ${met ? 'bg-[#34c759]' : 'bg-slate-100 border border-slate-200'}`}>
-      {met && <Check className="w-2.5 h-2.5 text-white" />}
-    </div>
-    <span className={`text-[12px] transition-all ${met ? 'text-[#34c759] font-medium' : 'text-[#86868b]'}`}>{label}</span>
-  </div>
-);
 
 export default Auth;
