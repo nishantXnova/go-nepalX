@@ -14,7 +14,9 @@ window.onunhandledrejection = function(event) {
   logger.error('Unhandled rejection:', event.reason);
 };
 
-// Service Worker Registration - Trekker's Ghost Mode
+// Service Worker Registration - DISABLED TEMPORARILY FOR TESTING
+// Re-enable after confirming auth works without SW
+/*
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
@@ -26,6 +28,7 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+*/
 
 try {
   createRoot(document.getElementById("root")!).render(<App />);
