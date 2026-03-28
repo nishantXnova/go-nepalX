@@ -50,6 +50,13 @@ self.addEventListener('fetch', (event) => {
   // Skip non-http(s) requests
   if (!url.protocol.startsWith('http')) return;
 
+  // NEVER cache Supabase auth requests - they must go to network
+  if (url.hostname.includes('supabase.co') && 
+      (url.pathname.includes('/auth/') || url.pathname.includes('/v1/'))) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
   // For navigation requests (HTML pages) - Network First
   if (request.mode === 'navigate') {
     event.respondWith(
