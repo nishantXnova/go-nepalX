@@ -50,10 +50,8 @@ self.addEventListener('fetch', (event) => {
   // Skip non-http(s) requests
   if (!url.protocol.startsWith('http')) return;
 
-  // NEVER cache Supabase auth requests - they must go to network
-  if (url.hostname.includes('supabase.co') && 
-      (url.pathname.includes('/auth/') || url.pathname.includes('/v1/'))) {
-    event.respondWith(fetch(request));
+  // Always let Supabase requests go directly to network - NO caching
+  if (url.hostname.includes('supabase.co')) {
     return;
   }
 
@@ -80,12 +78,6 @@ self.addEventListener('fetch', (event) => {
   // Static assets (JS, CSS) - StaleWhileRevalidate
   if (request.destination === 'script' || request.destination === 'style') {
     event.respondWith(staleWhileRevalidate(request));
-    return;
-  }
-
-  // API requests - NetworkFirst
-  if (url.hostname.includes('supabase.co') || url.hostname.includes('api.')) {
-    event.respondWith(networkFirst(request));
     return;
   }
 

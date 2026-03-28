@@ -52,13 +52,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let isMounted = true;
 
-    const initAuth = async () => {
-      try {
-        // Get session first
-        const { data: { session } } = await supabase.auth.getSession();
-        
+    try {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          if (!isMounted) return;
+
+          setSession(session);
+          const currentUser = session?.user ?? null;
+          setUser(currentUser);
+
+          if (currentUser) {
+            // Instant Admin Check
+            if (currentUser.email === 'paudelnishant15@gmail.com') {
+              setIsAdmin(true);
+            }
+            
+            await fetchProfile(currentUser.id, currentUser.email ?? undefined);
+            if (isMounted) setLoading(false);
+          } else {
+            setProfile(null);
+            setIsAdmin(false);
+            setIsGuide(false);
+            setLoading(false);
+          }
+        }
+      );
+
+      supabase.auth.getSession().then(({ data: { session } }) => {
         if (!isMounted) return;
-        
         if (session) {
           setSession(session);
           setUser(session.user);
@@ -66,45 +87,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (session.user.email === 'paudelnishant15@gmail.com') {
             setIsAdmin(true);
           }
-          await fetchProfile(session.user.id, session.user.email ?? undefined);
-        }
-        setLoading(false);
-      } catch (error) {
-        logger.warn('Auth initialization error:', error);
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!isMounted) return;
-
-        setSession(session);
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-
-        if (currentUser) {
-          // Instant Admin Check
-          if (currentUser.email === 'paudelnishant15@gmail.com') {
-            setIsAdmin(true);
-          }
-          
-          await fetchProfile(currentUser.id, currentUser.email ?? undefined);
+          fetchProfile(session.user.id, session.user.email ?? undefined).finally(() => {
+            if (isMounted) setLoading(false);
+          });
         } else {
-          setProfile(null);
-          setIsAdmin(false);
-          setIsGuide(false);
+          setLoading(false);
         }
-      }
-    );
+      }).catch(() => {
+        if (isMounted) setLoading(false);
+      });
 
-    initAuth();
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
+      return () => {
+        isMounted = false;
+        subscription.unsubscribe();
+      };
+    } catch (error) {
+      logger.warn('Auth initialization failed:', error);
+      if (isMounted) setLoading(false);
+    }
   }, []);
 
   const signUp = async (email: string, password: string, fullName?: string, role: string = 'traveller') => {
