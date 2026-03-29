@@ -1,7 +1,38 @@
 import { useLocation, Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { logger } from "@/utils/logger";
 import { Home, ArrowLeft, Mountain, MapPin } from "lucide-react";
+
+// Lazy-loaded image component with skeleton placeholder
+const LazyImage = ({ src, alt, className, priority = false }: { src: string; alt: string; className?: string; priority?: boolean }) => {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  return (
+    <div className="relative overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300">
+      {!error ? (
+        <img
+          src={src}
+          alt={alt}
+          loading={priority ? "eager" : "lazy"}
+          decoding={priority ? "sync" : "async"}
+          fetchPriority={priority ? "high" : "auto"}
+          onLoad={() => setLoaded(true)}
+          onError={() => setError(true)}
+          className={`${className} transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          style={{ display: 'block' }}
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-200">
+          <Mountain className="w-12 h-12 text-slate-400" />
+        </div>
+      )}
+      {!loaded && !error && (
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-white/30 to-transparent bg-[length:200%_100%]" />
+      )}
+    </div>
+  );
+};
 
 const NotFound = () => {
   const location = useLocation();
@@ -18,19 +49,8 @@ const NotFound = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center relative overflow-hidden">
-      {/* Topographic background pattern */}
-      <div className="absolute inset-0 opacity-[0.03]">
-        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <defs>
-            <pattern id="topo" patternUnits="userSpaceOnUse" width="50" height="50">
-              <path d="M0 25 Q12.5 15 25 25 T50 25" fill="none" stroke="currentColor" strokeWidth="0.5"/>
-              <path d="M0 37.5 Q12.5 27.5 25 37.5 T50 37.5" fill="none" stroke="currentColor" strokeWidth="0.5"/>
-              <path d="M0 50 Q12.5 40 25 50 T50 50" fill="none" stroke="currentColor" strokeWidth="0.5"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#topo)" />
-        </svg>
-      </div>
+      {/* Topographic background pattern - CSS only for performance */}
+      <div className="absolute inset-0 opacity-[0.03] bg-[repeating-linear-gradient(90deg,transparent,transparent_24px,currentColor_24px,currentColor_25px),repeating-linear-gradient(180deg,transparent,transparent_24px,currentColor_24px,currentColor_25px)]" />
 
       {/* Mountain gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-secondary/40 via-background to-accent/5"></div>
@@ -54,10 +74,11 @@ const NotFound = () => {
           <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[130%] h-32 bg-gradient-to-t from-primary/15 to-transparent rounded-full blur-2xl"></div>
           
           <div className="relative inline-block bg-[#f5f0e8]/90 rounded-3xl p-5 pb-6 backdrop-blur-sm">
-            <img 
+            <LazyImage 
               src="/404pic.png" 
               alt="Lost traveler exploring Nepal" 
               className="w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 object-cover object-center rounded-2xl shadow-2xl"
+              priority={true}
             />
           </div>
         </div>
@@ -106,8 +127,9 @@ const NotFound = () => {
                 to={dest.href}
                 className="group relative overflow-hidden rounded-xl w-36 sm:w-40 h-36 sm:h-40 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 border border-border/50 hover:border-primary/30"
               >
-                <img 
-                  src={dest.image} 
+              <LazyImage
+                  key={dest.name}
+                  src={dest.image}
                   alt={dest.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
