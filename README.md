@@ -71,17 +71,21 @@ To make Nepal accessible to every traveler by removing language barriers and pro
 
 ### 🛠️ Technical Differentiators
 
+GoNepal isn't just another travel app — it's a complex platform with 15-20 interconnected systems.
+
 | Feature | Our Approach | Others |
 |---------|---------------|--------|
-| **Translation** | MutationObserver-based real-time DOM translation | Static pages or basic i18n |
-| **Offline** | Service Worker + IndexedDB (Dexie.js) | None or basic cache |
-| **Maps** | Lightweight Leaflet + OpenStreetMap | Heavy Google Maps SDK |
-| **Data Fetching** | React Query with smart caching | Basic fetch or no caching |
-| **UI/UX** | Glassmorphic design + Framer Motion | Standard Bootstrap/Tailwind |
+| **Translation** | MutationObserver-based real-time DOM translation with neural processing | Static pages or basic i18n |
+| **Offline** | Service Worker + IndexedDB (Dexie.js) + Background sync | None or basic cache |
+| **Maps** | Lightweight Leaflet + OpenStreetMap + Overpass API | Heavy Google Maps SDK |
+| **Data Fetching** | React Query with smart caching + Optimistic updates | Basic fetch or no caching |
+| **UI/UX** | Glassmorphic design + Framer Motion + Custom hooks | Standard Bootstrap/Tailwind |
+| **PWA** | Full PWA with BLE, push notifications, install prompt | No PWA support |
+| **State** | Multiple contexts + Custom hooks + React Query | Basic useState/useContext |
 
 ### 📊 Our Architecture Achievements
 
-Based on our architectural design, we've achieved:
+GoNepal is not a simple CRUD application. A basic CRUD app has 3-4 moving parts. GoNepal has closer to **15-20 interconnected systems** working in harmony.
 
 | Metric | Architecture Design |
 |--------|---------------------|
@@ -89,8 +93,27 @@ Based on our architectural design, we've achieved:
 | **Offline Critical Features** | 100% (9 essential features offline-ready) |
 | **API Cost Optimization** | 64% (cache-first strategy) |
 | **Load Time Target** | <1s (Vite + optimized bundles) |
+| **Interconnected Systems** | 15-20 (translation, offline, BLE, weather, maps, auth, etc.) |
 
 > *These are architectural targets we're building toward with each release.*
+
+### 🔧 Interconnected Systems Overview
+
+GoNepal integrates multiple complex subsystems:
+
+| System | Components |
+|--------|------------|
+| **Translation Engine** | MutationObserver, Google Translate API, Neural DOM processor, Brand protection |
+| **Offline Architecture** | Service Worker, IndexedDB (Dexie.js), Cache strategy, Sync manager |
+| **BLE Proximity** | Device scanning, Connection manager, Notification system |
+| **Weather Integration** | Open-Meteo API, Geocoding (Nominatim), AI activity planner |
+| **Map System** | Leaflet, OpenStreetMap, POI search (Overpass API), Geofencing |
+| **Authentication** | Supabase Auth, Profile management, Session handling |
+| **PWA Features** | Install prompt, Push notifications, Background sync |
+| **State Management** | React contexts, Custom hooks, React Query caching |
+| **UI/UX Layer** | Framer Motion animations, Glassmorphic design, Responsive layouts |
+
+> *This level of integration is what makes GoNepal a truly enterprise-grade application.*
 
 ### 🤝 Community Recognition
 
@@ -149,7 +172,15 @@ GoNepal offers value to Nepal's tourism ecosystem:
 - Emergency response coordination
 
 ### ✈️ Airlines & Transportation
+
 - Flight search integration for Nepal carriers
+- Direct booking links to major airlines:
+  - **Yeti Airlines** - [yetin Airlines.com](https://www.yetiairlines.com)
+  - **Buddha Air** - [buddhaair.com](https://www.buddhaair.com)
+  - **Shree Airlines** - [shreeairlines.com](https://www.shreeairlines.com)
+  - **Saurya Air** - [sauryaair.com](https://sauryaair.com)
+  - **Tara Air** - [taraair.com](https://www.taraair.com)
+  - **Nepal Airlines** - [nepalairlines.com.np](https://www.nepalairlines.com.np)
 - Destination promotion opportunities
 - Weather-aware travel communications
 
@@ -206,7 +237,7 @@ GoNepal offers value to Nepal's tourism ecosystem:
 | **Currency Converter** | Real-time conversion for NPR and global currencies |
 | **Travel Phrasebook** | Quick-access Nepali phrases for travelers |
 | **Weather Forecast** | Global weather with AI activity recommendations |
-| **Flight Booking** | Search and compare flights from Nepal-based airlines |
+| **Flight Booking** | Search and compare flights from Nepal-based airlines including Nepal Airlines, Yeti Airlines, Buddha Air, and more |
 
 ### 💎 Premium Experience
 
@@ -521,7 +552,7 @@ We're continuously working to improve GoNepal. Here are some features we're plan
 | Feature | Description | Status | Revenue Model |
 |---------|-------------|--------|---------------|
 | **Guide Marketplace** | Connect tourists with verified local trekking/tour guides | 🔄 In Development | Commission on bookings |
-| **Flight Booking** | Search & compare flights from Nepal-based airlines | ✅ Implemented | Affiliate commissions |
+| **Flight Booking** | Multiple airline options including Yeti Airlines, Buddha Air, Shree Airlines, Saurya Air, Tara Air with direct booking links | ✅ Fully Implemented | Affiliate commissions |
 | **Featured Listings** | Hotels, restaurants, shops paying for priority visibility | 🔄 Planned | Subscription/Listings fees |
 | **Guide Premium Features** | Analytics, profile boosts, verified badges for guides | 🔄 Planned | Premium subscriptions |
 | **Local Business Ads** | Targeted advertisements for local businesses | 🔄 Planned | Pay-per-click ads |

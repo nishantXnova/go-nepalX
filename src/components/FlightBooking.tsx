@@ -1,14 +1,48 @@
 import { motion } from "framer-motion";
-import { Plane, ExternalLink, Calendar, MapPin, Clock } from "lucide-react";
+import { Plane, ExternalLink, Calendar, MapPin, Clock, ChevronDown, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const popularRoutes = [
   { from: "Kathmandu", to: "Pokhara", duration: "25 min", frequency: "Daily" },
   { from: "Kathmandu", to: "Lukla", duration: "35 min", frequency: "Daily (weather permitting)" },
   { from: "Pokhara", to: "Jomsom", duration: "20 min", frequency: "Daily" },
   { from: "Kathmandu", to: "Bharatpur", duration: "25 min", frequency: "Daily" },
-  { from: "Kathmandu", to: "Biratnagar", duration: "35 min", frequency: "Daily" },
-  { from: "Kathmandu", to: "Nepalgunj", duration: "1 hr", frequency: "Daily" },
+  { from: "Kathmandu", to: "Biratnagar", duration: "35–40 min", frequency: "Daily" },
+  { from: "Kathmandu", to: "Nepalgunj", duration: "50–60 min", frequency: "Daily" },
+];
+
+const airlines = [
+  { 
+    name: "Yeti Airlines", 
+    website: "https://www.yetiairlines.com/",
+    description: "Leading domestic carrier with extensive mountain route coverage",
+    featured: true
+  },
+  { 
+    name: "Buddha Air", 
+    website: "https://www.buddhaair.com/",
+    description: "Premier domestic airline serving major destinations",
+    featured: true
+  },
+  { 
+    name: "Shree Airlines", 
+    website: "https://www.shreeairlines.com/",
+    description: "Reliable domestic flights with competitive pricing",
+    featured: true
+  },
+  { 
+    name: "Saurya Air", 
+    website: "https://sauryaairlines.com/",
+    description: "Efficient domestic connectivity",
+    featured: false
+  },
+  { 
+    name: "Tara Air", 
+    website: "https://www.taraair.com/",
+    description: "Mountain specialist with remote destination expertise",
+    featured: false
+  },
 ];
 
 const containerVariants = {
@@ -34,8 +68,14 @@ const itemVariants = {
 };
 
 const FlightBooking = () => {
+  const [showAllAirlines, setShowAllAirlines] = useState(false);
+  
   const handleBookFlight = () => {
     window.open("https://www.nepalairlines.com.np/", "_blank", "noopener,noreferrer");
+  };
+
+  const handleAirlineClick = (website: string) => {
+    window.open(website, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -128,6 +168,56 @@ const FlightBooking = () => {
             <p className="text-xs text-muted-foreground text-center mt-4">
               You'll be redirected to nepalairlines.com.np to complete your booking
             </p>
+
+            {/* More Airlines Button */}
+            <div className="mt-6 pt-6 border-t border-border">
+              <Button
+                variant="outline"
+                onClick={() => setShowAllAirlines(!showAllAirlines)}
+                className="w-full flex items-center justify-center gap-2 py-4"
+              >
+                <Globe className="h-4 w-4" />
+                <span>More Airlines & Options</span>
+                <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${showAllAirlines ? 'rotate-180' : ''}`} />
+              </Button>
+
+              {showAllAirlines && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-4 space-y-3"
+                >
+                  <p className="text-sm font-medium text-foreground mb-3">Popular Domestic Airlines</p>
+                  {airlines.map((airline, index) => (
+                    <motion.button
+                      key={airline.name}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.05 }}
+                      onClick={() => handleAirlineClick(airline.website)}
+                      className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
+                        airline.featured 
+                          ? 'bg-accent/5 border-accent/30 hover:bg-accent/10 hover:border-accent/50' 
+                          : 'bg-secondary/30 border-border/50 hover:bg-secondary/50 hover:border-border'
+                      }`}
+                    >
+                      <div className="flex flex-col items-start">
+                        <span className="font-medium text-foreground">{airline.name}</span>
+                        <span className="text-xs text-muted-foreground">{airline.description}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {airline.featured && (
+                          <span className="text-xs bg-accent/20 text-accent px-2 py-1 rounded-full">Popular</span>
+                        )}
+                        <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </motion.button>
+                  ))}
+                </motion.div>
+              )}
+            </div>
           </motion.div>
 
           {/* Right - Popular Routes */}
