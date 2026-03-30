@@ -59,8 +59,6 @@
       "form_factor": "wide"
     }
   ],
-  "prefer_related_applications": false,
-  "related_applications": [],
   "shortcuts": [
     {
       "name": "Explore Destinations",
@@ -131,30 +129,5 @@
       "url": "/?protocol=%s"
     }
   ],
-  "display_override": ["window-controls-overlay", "tabbed"],
-  "iarc_rating_id": "76-secure-8888-0000-0000-gonepal",
-  "widgets": {
-    "name": "GoNepal Weather",
-    "icons": [
-      {
-        "src": "/android-chrome-192x192.png",
-        "sizes": "192x192"
-      }
-    ]
-  },
-  "edge_side_panel": {
-    "preferred_resources": ["icon", "logo"]
-  },
-  "note_taking": {
-    "launch_handler": {
-      "client_mode": "focus-existing"
-    },
-    "file_handlers": [
-      {
-        "accept": {
-          "text/plain": [".txt", ".md"]
-        }
-      }
-    ]
-  }
+  "display_override": ["window-controls-overlay", "tabbed"]
 }
