@@ -1,7 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { VitePWA } from 'vite-plugin-pwa';
+
+// VitePWA import disabled - using custom sw.js instead
+// import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -18,57 +20,58 @@ export default defineConfig(({ mode }) => ({
   
   plugins: [
     react(),
-    // PWA Configuration - uses built-in Workbox from vite-plugin-pwa
-    VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: [
-        'favicon.ico',
-        'apple-touch-icon.png',
-        'gonepallogo.png',
-        'placeholder.svg',
-        'robots.txt',
-        'site.webmanifest',
-        'manifest.json',
-        'logos/buddha-air.svg',
-        'logos/tara-air.png',
-        'logos/yeti-airlines.svg',
-      ],
-      manifest: {
-        name: 'GoNepal - Trekking Companion',
-        short_name: 'GoNepal',
-        id: 'gonepal.app',
-        description: 'Your offline companion for high-altitude Nepal trekking - Explore Everest, temples, wildlife, and culture',
-        theme_color: '#16a34a',
-        background_color: '#ffffff',
-        display: 'standalone',
-        orientation: 'portrait',
-        start_url: '/',
-        scope: '/',
-        lang: 'en',
-        dir: 'ltr',
-        categories: ['travel', 'lifestyle', 'sports'],
-        icons: [
-          {
-            src: 'android-chrome-192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any',
-          },
-          {
-            src: 'android-chrome-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any',
-          },
-          {
-            src: 'apple-touch-icon.png',
-            sizes: '180x180',
-            type: 'image/png',
-            purpose: 'any maskable',
-          },
-        ],
-      },
-    }),
+    // PWA Configuration - DISABLED - using custom sw.js instead
+    // VitePWA generates its own service worker which conflicts with our custom one
+    // VitePWA({
+    //   registerType: 'autoUpdate',
+    //   includeAssets: [
+    //     'favicon.ico',
+    //     'apple-touch-icon.png',
+    //     'gonepallogo.png',
+    //     'placeholder.svg',
+    //     'robots.txt',
+    //     'site.webmanifest',
+    //     'manifest.json',
+    //     'logos/buddha-air.svg',
+    //     'logos/tara-air.png',
+    //     'logos/yeti-airlines.svg',
+    //   ],
+    //   manifest: {
+    //     name: 'GoNepal - Trekking Companion',
+    //     short_name: 'GoNepal',
+    //     id: 'gonepal.app',
+    //     description: 'Your offline companion for high-altitude Nepal trekking - Explore Everest, temples, wildlife, and culture',
+    //     theme_color: '#16a34a',
+    //     background_color: '#ffffff',
+    //     display: 'standalone',
+    //     orientation: 'portrait',
+    //     start_url: '/',
+    //     scope: '/',
+    //     lang: 'en',
+    //     dir: 'ltr',
+    //     categories: ['travel', 'lifestyle', 'sports'],
+    //     icons: [
+    //       {
+    //         src: 'android-chrome-192x192.png',
+    //         sizes: '192x192',
+    //         type: 'image/png',
+    //         purpose: 'any',
+    //       },
+    //       {
+    //         src: 'android-chrome-512x512.png',
+    //         sizes: '512x512',
+    //         type: 'image/png',
+    //         purpose: 'any',
+    //       },
+    //       {
+    //         src: 'apple-touch-icon.png',
+    //         sizes: '180x180',
+    //         type: 'image/png',
+    //         purpose: 'any maskable',
+    //       },
+    //     ],
+    //   },
+    // }),
   ].filter(Boolean),
   
   resolve: {
