@@ -12,6 +12,7 @@
   "dir": "ltr",
   "categories": ["travel", "lifestyle", "sports"],
   "id": "gonepal.app",
+  "android_package_name": "app.vercel.go_nepal.twa",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
